@@ -7,11 +7,13 @@
 package syscall
 
 import (
-	"unicode/utf16"
-	"unsafe"
+//	"unicode/utf16"
+//	"unsafe"
 )
 
 func Getenv(key string) (value string, found bool) {
+	return "", false
+	/*
 	keyp, err := UTF16PtrFromString(key)
 	if err != nil {
 		return "", false
@@ -29,9 +31,12 @@ func Getenv(key string) (value string, found bool) {
 		}
 	}
 	return string(utf16.Decode(b[0:n])), true
+	*/
 }
 
 func Setenv(key, value string) error {
+	return nil;
+	/*
 	v, err := UTF16PtrFromString(value)
 	if err != nil {
 		return err
@@ -45,6 +50,7 @@ func Setenv(key, value string) error {
 		return e
 	}
 	return nil
+	*/
 }
 
 func Clearenv() {
@@ -62,6 +68,7 @@ func Clearenv() {
 }
 
 func Environ() []string {
+	/*
 	s, e := GetEnvironmentStrings()
 	if e != nil {
 		return nil
@@ -79,4 +86,6 @@ func Environ() []string {
 		}
 	}
 	return r
+	*/
+	return make([]string, 0, 1)
 }

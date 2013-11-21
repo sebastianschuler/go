@@ -17,8 +17,8 @@
 #pragma dynimport runtime·CryptReleaseContext CryptReleaseContext "advapi32.dll"
 #pragma dynimport runtime·DuplicateHandle DuplicateHandle "kernel32.dll"
 #pragma dynimport runtime·ExitProcess ExitProcess "kernel32.dll"
-#pragma dynimport runtime·FreeEnvironmentStringsW FreeEnvironmentStringsW "kernel32.dll"
-#pragma dynimport runtime·GetEnvironmentStringsW GetEnvironmentStringsW "kernel32.dll"
+//#pragma dynimport runtime·FreeEnvironmentStringsW FreeEnvironmentStringsW "kernel32.dll"
+//#pragma dynimport runtime·GetEnvironmentStringsW GetEnvironmentStringsW "kernel32.dll"
 #pragma dynimport runtime·GetProcAddress GetProcAddress "kernel32.dll"
 #pragma dynimport runtime·GetStdHandle GetStdHandle "kernel32.dll"
 #pragma dynimport runtime·GetSystemInfo GetSystemInfo "kernel32.dll"
@@ -128,6 +128,7 @@ runtime·get_random_data(byte **rnd, int32 *rnd_len)
 void
 runtime·goenvs(void)
 {
+	/*
 	extern Slice syscall·envs;
 
 	uint16 *env;
@@ -153,6 +154,7 @@ runtime·goenvs(void)
 	syscall·envs.cap = n;
 
 	runtime·stdcall(runtime·FreeEnvironmentStringsW, 1, env);
+	*/
 }
 
 void
