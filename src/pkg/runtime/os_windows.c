@@ -11,7 +11,7 @@
 #pragma dynimport runtime·CloseHandle CloseHandle "kernel32.dll"
 #pragma dynimport runtime·CreateEvent CreateEventA "kernel32.dll"
 #pragma dynimport runtime·CreateThread CreateThread "kernel32.dll"
-#pragma dynimport runtime·CreateWaitableTimer CreateWaitableTimerA "kernel32.dll"
+//#pragma dynimport runtime·CreateWaitableTimer CreateWaitableTimerA "kernel32.dll"
 #pragma dynimport runtime·CryptAcquireContextW CryptAcquireContextW "advapi32.dll"
 #pragma dynimport runtime·CryptGenRandom CryptGenRandom "advapi32.dll"
 #pragma dynimport runtime·CryptReleaseContext CryptReleaseContext "advapi32.dll"
@@ -30,7 +30,7 @@
 #pragma dynimport runtime·SetConsoleCtrlHandler SetConsoleCtrlHandler "kernel32.dll"
 #pragma dynimport runtime·SetEvent SetEvent "kernel32.dll"
 #pragma dynimport runtime·SetThreadPriority SetThreadPriority "kernel32.dll"
-#pragma dynimport runtime·SetWaitableTimer SetWaitableTimer "kernel32.dll"
+//#pragma dynimport runtime·SetWaitableTimer SetWaitableTimer "kernel32.dll"
 #pragma dynimport runtime·Sleep Sleep "kernel32.dll"
 #pragma dynimport runtime·SuspendThread SuspendThread "kernel32.dll"
 #pragma dynimport runtime·timeBeginPeriod timeBeginPeriod "winmm.dll"
@@ -438,6 +438,7 @@ runtime·profileloop1(void)
 void
 runtime·resetcpuprofiler(int32 hz)
 {
+	/*
 	static Lock lock;
 	void *timer, *thread;
 	int32 ms;
@@ -464,6 +465,7 @@ runtime·resetcpuprofiler(int32 hz)
 	runtime·stdcall(runtime·SetWaitableTimer, 6,
 		profiletimer, &due, (uintptr)ms, nil, nil, nil);
 	runtime·atomicstore((uint32*)&m->profilehz, hz);
+	*/
 }
 
 void
