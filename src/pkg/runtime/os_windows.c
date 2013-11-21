@@ -27,7 +27,7 @@
 #pragma dynimport runtime·LoadLibrary LoadLibraryW "kernel32.dll"
 #pragma dynimport runtime·LoadLibraryA LoadLibraryA "kernel32.dll"
 #pragma dynimport runtime·ResumeThread ResumeThread "kernel32.dll"
-#pragma dynimport runtime·SetConsoleCtrlHandler SetConsoleCtrlHandler "kernel32.dll"
+//#pragma dynimport runtime·SetConsoleCtrlHandler SetConsoleCtrlHandler "kernel32.dll"
 #pragma dynimport runtime·SetEvent SetEvent "kernel32.dll"
 #pragma dynimport runtime·SetThreadPriority SetThreadPriority "kernel32.dll"
 //#pragma dynimport runtime·SetWaitableTimer SetWaitableTimer "kernel32.dll"
@@ -90,7 +90,7 @@ runtime·osinit(void)
 	runtime·stdcall(runtime·DuplicateHandle, 7,
 		(uintptr)-1, (uintptr)-2, (uintptr)-1, &m->thread,
 		(uintptr)0, (uintptr)0, (uintptr)DUPLICATE_SAME_ACCESS);
-	runtime·stdcall(runtime·SetConsoleCtrlHandler, 2, runtime·ctrlhandler, (uintptr)1);
+	//runtime·stdcall(runtime·SetConsoleCtrlHandler, 2, runtime·ctrlhandler, (uintptr)1);
 	runtime·stdcall(runtime·timeBeginPeriod, 1, (uintptr)1);
 	runtime·ncpu = getproccount();
 
