@@ -361,15 +361,17 @@ TEXT runtime·usleep1(SB),NOSPLIT,$0
 // Runs on OS stack. duration (in 100ns units) is in BX.
 TEXT runtime·usleep2(SB),NOSPLIT,$20
 	// Want negative 100ns units.
-	NEGL	BX
-	MOVL	$-1, hi-4(SP)
-	MOVL	BX, lo-8(SP)
-	LEAL	lo-8(SP), BX
-	MOVL	BX, ptime-12(SP)
+	//NEGL	BX
+	//MOVL	$-1, hi-4(SP)
+	//MOVL	BX, lo-8(SP)
+	//LEAL	lo-8(SP), BX
+	//MOVL	BX, ptime-12(SP)
+	
 	MOVL	$0, alertable-16(SP)
 	MOVL	$-1, handle-20(SP)
 	MOVL	SP, BP
-	MOVL	runtime·NtWaitForSingleObject(SB), AX
+	MOVL	runtime·WaitForSingleObject(SB), AX
+	//MOVL	runtime·NtWaitForSingleObject(SB), AX
 	CALL	AX
 	MOVL	BP, SP
 	RET

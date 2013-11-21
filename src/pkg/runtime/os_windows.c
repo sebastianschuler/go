@@ -36,9 +36,9 @@
 #pragma dynimport runtime·timeBeginPeriod timeBeginPeriod "winmm.dll"
 #pragma dynimport runtime·WaitForSingleObject WaitForSingleObject "kernel32.dll"
 #pragma dynimport runtime·WriteFile WriteFile "kernel32.dll"
-#pragma dynimport runtime·NtWaitForSingleObject NtWaitForSingleObject "ntdll.dll"
+//#pragma dynimport runtime·NtWaitForSingleObject NtWaitForSingleObject "ntdll.dll"
 
-extern void *runtime·NtWaitForSingleObject;
+//extern void *runtime·NtWaitForSingleObject;
 
 extern void *runtime·CloseHandle;
 extern void *runtime·CreateEvent;
