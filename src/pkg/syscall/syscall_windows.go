@@ -138,7 +138,8 @@ func NewCallback(fn interface{}) uintptr
 //sys	MoveFile(from *uint16, to *uint16) (err error) = MoveFileW
 //sys	GetComputerName(buf *uint16, n *uint32) (err error) = GetComputerNameW
 //sys	SetEndOfFile(handle Handle) (err error)
-//sys	GetSystemTimeAsFileTime(time *Filetime)
+//sys	GetSystemTime(systime *Systemtime)
+//sys	SystemTimeToFileTime(systime *Systemtime, filetime *Filetime)
 //sys	GetTimeZoneInformation(tzi *Timezoneinformation) (rc uint32, err error) [failretval==0xffffffff]
 //sys	CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error)
 //sys	GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overlapped **Overlapped, timeout uint32) (err error)
@@ -420,8 +421,10 @@ func Ftruncate(fd Handle, length int64) (err error) {
 }
 
 func Gettimeofday(tv *Timeval) (err error) {
+	var st Systemtime
 	var ft Filetime
-	GetSystemTimeAsFileTime(&ft)
+	GetSystemTime(&st)
+	SystemTimeToFileTime(&st, &ft)
 	*tv = NsecToTimeval(ft.Nanoseconds())
 	return nil
 }

@@ -43,7 +43,8 @@ var (
 	procMoveFileW                          = modkernel32.NewProc("MoveFileW")
 	procGetComputerNameW                   = modkernel32.NewProc("GetComputerNameW")
 	procSetEndOfFile                       = modkernel32.NewProc("SetEndOfFile")
-	procGetSystemTimeAsFileTime            = modkernel32.NewProc("GetSystemTimeAsFileTime")
+	procGetSystemTime            		   = modkernel32.NewProc("GetSystemTime")
+	procSystemTimeToFileTime               = modkernel32.NewProc("SystemTimeToFileTime")
 	procGetTimeZoneInformation             = modkernel32.NewProc("GetTimeZoneInformation")
 	procCreateIoCompletionPort             = modkernel32.NewProc("CreateIoCompletionPort")
 	procGetQueuedCompletionStatus          = modkernel32.NewProc("GetQueuedCompletionStatus")
@@ -475,8 +476,13 @@ func SetEndOfFile(handle Handle) (err error) {
 	return
 }
 
-func GetSystemTimeAsFileTime(time *Filetime) {
-	Syscall(procGetSystemTimeAsFileTime.Addr(), 1, uintptr(unsafe.Pointer(time)), 0, 0)
+func GetSystemTime(systime *Systemtime) {
+	Syscall(procGetSystemTime.Addr(), 1, uintptr(unsafe.Pointer(systime)), 0, 0)
+	return
+}
+
+func SystemTimeToFileTime(systime *Systemtime, filetime *Filetime) {
+	Syscall(procSystemTimeToFileTime.Addr(), 2, uintptr(unsafe.Pointer(systime)), uintptr(unsafe.Pointer(filetime)), 0)
 	return
 }
 

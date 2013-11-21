@@ -22,7 +22,9 @@
 #pragma dynimport runtime·GetProcAddress GetProcAddress "kernel32.dll"
 #pragma dynimport runtime·GetStdHandle GetStdHandle "kernel32.dll"
 #pragma dynimport runtime·GetSystemInfo GetSystemInfo "kernel32.dll"
-#pragma dynimport runtime·GetSystemTimeAsFileTime GetSystemTimeAsFileTime "kernel32.dll"
+#pragma dynimport runtime·GetSystemTime GetSystemTime "kernel32.dll"
+#pragma dynimport runtime·SystemTimeToFileTime SystemTimeToFileTime "kernel32.dll"
+//#pragma dynimport runtime·GetSystemTimeAsFileTime GetSystemTimeAsFileTime "kernel32.dll"
 #pragma dynimport runtime·GetThreadContext GetThreadContext "kernel32.dll"
 #pragma dynimport runtime·LoadLibrary LoadLibraryW "kernel32.dll"
 #pragma dynimport runtime·LoadLibraryA LoadLibraryA "kernel32.dll"
@@ -54,7 +56,8 @@ extern void *runtime·GetEnvironmentStringsW;
 extern void *runtime·GetProcAddress;
 extern void *runtime·GetStdHandle;
 extern void *runtime·GetSystemInfo;
-extern void *runtime·GetSystemTimeAsFileTime;
+extern void *runtime·GetSystemTime;
+extern void *runtime·SystemTimeToFileTime;
 extern void *runtime·GetThreadContext;
 extern void *runtime·LoadLibrary;
 extern void *runtime·LoadLibraryA;
@@ -261,9 +264,11 @@ runtime·unminit(void)
 int64
 runtime·nanotime(void)
 {
+	byte systemtime[16];
 	int64 filetime;
 
-	runtime·stdcall(runtime·GetSystemTimeAsFileTime, 1, &filetime);
+	runtime·stdcall(runtime·GetSystemTime, 1, &systemtime);
+	runtime·stdcall(runtime·SystemTimeToFileTime, 2, &systemtime, &filetime);
 
 	// Filetime is 100s of nanoseconds since January 1, 1601.
 	// Convert to nanoseconds since January 1, 1970.
