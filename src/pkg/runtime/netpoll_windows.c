@@ -9,7 +9,7 @@
 #define DWORD_MAX 0xffffffff
 
 #pragma dynimport runtime·CreateIoCompletionPort CreateIoCompletionPort "kernel32.dll"
-#pragma dynimport runtime·GetQueuedCompletionStatus GetQueuedCompletionStatus "kernel32.dll"
+//#pragma dynimport runtime·GetQueuedCompletionStatus GetQueuedCompletionStatus "kernel32.dll"
 #pragma dynimport runtime·WSAGetOverlappedResult WSAGetOverlappedResult "ws2_32.dll"
 
 extern void *runtime·CreateIoCompletionPort;
@@ -109,7 +109,7 @@ retry:
 				errno = runtime·getlasterror();
 			handlecompletion(&gp, op, errno, qty);
 		}
-	} else {
+	} /*else {
 		op = nil;
 		errno = 0;
 		qty = 0;
@@ -124,7 +124,7 @@ retry:
 			// dequeued failed IO packet, so report that
 		}
 		handlecompletion(&gp, op, errno, qty);
-	}
+	}*/
 	if(block && gp == nil)
 		goto retry;
 	return gp;
