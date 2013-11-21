@@ -20,7 +20,7 @@
 //#pragma dynimport runtime·FreeEnvironmentStringsW FreeEnvironmentStringsW "kernel32.dll"
 //#pragma dynimport runtime·GetEnvironmentStringsW GetEnvironmentStringsW "kernel32.dll"
 #pragma dynimport runtime·GetProcAddress GetProcAddress "kernel32.dll"
-#pragma dynimport runtime·GetStdHandle GetStdHandle "kernel32.dll"
+#pragma dynimport runtime·GetStdPathW GetStdioPathW "kernel32.dll"
 #pragma dynimport runtime·GetSystemInfo GetSystemInfo "kernel32.dll"
 #pragma dynimport runtime·GetSystemTime GetSystemTime "kernel32.dll"
 #pragma dynimport runtime·SystemTimeToFileTime SystemTimeToFileTime "kernel32.dll"
@@ -54,7 +54,7 @@ extern void *runtime·ExitProcess;
 extern void *runtime·FreeEnvironmentStringsW;
 extern void *runtime·GetEnvironmentStringsW;
 extern void *runtime·GetProcAddress;
-extern void *runtime·GetStdHandle;
+extern void *runtime·GetStdioPathW;
 extern void *runtime·GetSystemInfo;
 extern void *runtime·GetSystemTime;
 extern void *runtime·SystemTimeToFileTime;
@@ -169,6 +169,7 @@ runtime·exit(int32 code)
 int32
 runtime·write(int32 fd, void *buf, int32 n)
 {
+	/*
 	void *handle;
 	uint32 written;
 
@@ -185,6 +186,8 @@ runtime·write(int32 fd, void *buf, int32 n)
 	}
 	runtime·stdcall(runtime·WriteFile, 5, handle, buf, (uintptr)n, &written, (uintptr)0);
 	return written;
+	*/
+	return -1;
 }
 
 #define INFINITE ((uintptr)0xFFFFFFFF)
