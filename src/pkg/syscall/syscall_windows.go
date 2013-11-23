@@ -149,8 +149,6 @@ func NewCallback(fn interface{}) uintptr
 //sys	OpenProcess(da uint32, inheritHandle bool, pid uint32) (handle Handle, err error)
 //sys	TerminateProcess(handle Handle, exitcode uint32) (err error)
 //sys	GetExitCodeProcess(handle Handle, exitcode *uint32) (err error)
-///sys	GetStartupInfo(startupInfo *StartupInfo) (err error) = GetStartupInfoW
-///sys	GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error)
 //sys	DuplicateHandle(hSourceProcessHandle Handle, hSourceHandle Handle, hTargetProcessHandle Handle, lpTargetHandle *Handle, dwDesiredAccess uint32, bInheritHandle bool, dwOptions uint32) (err error)
 //sys	WaitForSingleObject(handle Handle, waitMilliseconds uint32) (event uint32, err error) [failretval==0xffffffff]
 //sys	GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) = GetTempPathW
@@ -168,7 +166,6 @@ func NewCallback(fn interface{}) uintptr
 //sys	SetFileAttributes(name *uint16, attrs uint32) (err error) = SetFileAttributesW
 //sys	GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) = GetFileAttributesExW
 //sys	GetCommandLine() (cmd *uint16) = GetCommandLineW
-///sys	CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error) [failretval==nil] = shell32.CommandLineToArgvW
 //sys	LocalFree(hmem Handle) (handle Handle, err error) [failretval!=0]
 ///sys	SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error)
 //sys	FlushFileBuffers(handle Handle) (err error)
@@ -973,8 +970,6 @@ func (s Signal) String() string {
 }
 
 // TODO(sebastian): Find workarounds
-func GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error)										{ return EWINDOWS }
-func CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error)									 													{ return nil, EWINDOWS }
 func GetConsoleMode(console Handle, mode *uint32) (err error)																												{ return EWINDOWS }
 func WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error)																	{ return EWINDOWS }
 func ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error)																	{ return EWINDOWS }

@@ -28,10 +28,13 @@ func (p *Process) wait() (ps *ProcessState, err error) {
 		return nil, NewSyscallError("GetExitCodeProcess", e)
 	}
 	var u syscall.Rusage
+	// NOTE(sebastian): GetProcessTimes is not available on Windows CE
+	/*
 	e = syscall.GetProcessTimes(syscall.Handle(p.handle), &u.CreationTime, &u.ExitTime, &u.KernelTime, &u.UserTime)
 	if e != nil {
 		return nil, NewSyscallError("GetProcessTimes", e)
 	}
+	*/
 	p.setDone()
 	// NOTE(brainman): It seems that sometimes process is not dead
 	// when WaitForSingleObject returns. But we do not know any
@@ -90,6 +93,9 @@ func findProcess(pid int) (p *Process, err error) {
 func init() {
 	var argc int32
 	cmd := syscall.GetCommandLine()
+	// NOTE(sebastian): Buggy? See first comment here: http://msdn.microsoft.com/en-us/library/windows/desktop/bb776391(v=vs.85).aspx
+	// TODO(sebastian): Implement yourself
+	/*
 	argv, e := syscall.CommandLineToArgv(cmd, &argc)
 	if e != nil {
 		return
@@ -99,6 +105,7 @@ func init() {
 	for i, v := range (*argv)[:argc] {
 		Args[i] = string(syscall.UTF16ToString((*v)[:]))
 	}
+	*/
 }
 
 func ftToDuration(ft *syscall.Filetime) time.Duration {
