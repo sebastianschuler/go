@@ -116,99 +116,101 @@ func NewCallback(fn interface{}) uintptr
 //sys	GetLastError() (lasterr error)
 //sys	LoadLibrary(libname string) (handle Handle, err error) = LoadLibraryW
 //sys	FreeLibrary(handle Handle) (err error)
-//sys	GetProcAddress(module Handle, procname string) (proc uintptr, err error)
-//sys	GetVersion() (ver uint32, err error)
+//sys	GetProcAddress(module Handle, procname string) (proc uintptr, err error) = GetProcAddressA
+///sys	GetVersion() (ver uint32, err error)
 //sys	FormatMessage(flags uint32, msgsrc uint32, msgid uint32, langid uint32, buf []uint16, args *byte) (n uint32, err error) = FormatMessageW
-//sys	ExitProcess(exitcode uint32)
 //sys	CreateFile(name *uint16, access uint32, mode uint32, sa *SecurityAttributes, createmode uint32, attrs uint32, templatefile int32) (handle Handle, err error) [failretval==InvalidHandle] = CreateFileW
 //sys	ReadFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) (err error)
 //sys	WriteFile(handle Handle, buf []byte, done *uint32, overlapped *Overlapped) (err error)
 //sys	SetFilePointer(handle Handle, lowoffset int32, highoffsetptr *int32, whence uint32) (newlowoffset uint32, err error) [failretval==0xffffffff]
 //sys	CloseHandle(handle Handle) (err error)
-//sys	GetStdioPath(stdhandle int, buf *uint16, buflen uint32) (err error) = GetStdioPathW
+//sys	OpenStdConsole(stdhandle int, dev *uint32) (handle Handle, err error)
 //sys	findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstFileW
 //sys	findNextFile1(handle Handle, data *win32finddata1) (err error) = FindNextFileW
 //sys	FindClose(handle Handle) (err error)
 //sys	GetFileInformationByHandle(handle Handle, data *ByHandleFileInformation) (err error)
-//sys	GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) = GetCurrentDirectoryW
-//sys	SetCurrentDirectory(path *uint16) (err error) = SetCurrentDirectoryW
+///sys	GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) = GetCurrentDirectoryW
+///sys	SetCurrentDirectory(path *uint16) (err error) = SetCurrentDirectoryW
 //sys	CreateDirectory(path *uint16, sa *SecurityAttributes) (err error) = CreateDirectoryW
 //sys	RemoveDirectory(path *uint16) (err error) = RemoveDirectoryW
 //sys	DeleteFile(path *uint16) (err error) = DeleteFileW
 //sys	MoveFile(from *uint16, to *uint16) (err error) = MoveFileW
-//sys	GetComputerName(buf *uint16, n *uint32) (err error) = GetComputerNameW
+///sys	GetComputerName(buf *uint16, n *uint32) (err error) = GetComputerNameW
 //sys	SetEndOfFile(handle Handle) (err error)
 //sys	GetSystemTime(systime *Systemtime)
 //sys	SystemTimeToFileTime(systime *Systemtime, filetime *Filetime)
 //sys	GetTimeZoneInformation(tzi *Timezoneinformation) (rc uint32, err error) [failretval==0xffffffff]
-//sys	CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error)
-//sys	GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overlapped **Overlapped, timeout uint32) (err error)
-//sys	PostQueuedCompletionStatus(cphandle Handle, qty uint32, key uint32, overlapped *Overlapped) (err error)
-//sys	CancelIo(s Handle) (err error)
-//sys	CancelIoEx(s Handle, o *Overlapped) (err error)
+///sys	CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error)
+///sys	GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overlapped **Overlapped, timeout uint32) (err error)
+///sys	PostQueuedCompletionStatus(cphandle Handle, qty uint32, key uint32, overlapped *Overlapped) (err error)
+///sys	CancelIo(s Handle) (err error)
+///sys	CancelIoEx(s Handle, o *Overlapped) (err error)
 //sys	CreateProcess(appName *uint16, commandLine *uint16, procSecurity *SecurityAttributes, threadSecurity *SecurityAttributes, inheritHandles bool, creationFlags uint32, env *uint16, currentDir *uint16, startupInfo *StartupInfo, outProcInfo *ProcessInformation) (err error) = CreateProcessW
 //sys	OpenProcess(da uint32, inheritHandle bool, pid uint32) (handle Handle, err error)
 //sys	TerminateProcess(handle Handle, exitcode uint32) (err error)
 //sys	GetExitCodeProcess(handle Handle, exitcode *uint32) (err error)
-//sys	GetStartupInfo(startupInfo *StartupInfo) (err error) = GetStartupInfoW
-//sys	GetCurrentProcess() (pseudoHandle Handle, err error)
-//sys	GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error)
+///sys	GetStartupInfo(startupInfo *StartupInfo) (err error) = GetStartupInfoW
+///sys	GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error)
 //sys	DuplicateHandle(hSourceProcessHandle Handle, hSourceHandle Handle, hTargetProcessHandle Handle, lpTargetHandle *Handle, dwDesiredAccess uint32, bInheritHandle bool, dwOptions uint32) (err error)
 //sys	WaitForSingleObject(handle Handle, waitMilliseconds uint32) (event uint32, err error) [failretval==0xffffffff]
 //sys	GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) = GetTempPathW
-//sys	CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error)
-//sys	GetFileType(filehandle Handle) (n uint32, err error)
-//sys	CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) = advapi32.CryptAcquireContextW
-//sys	CryptReleaseContext(provhandle Handle, flags uint32) (err error) = advapi32.CryptReleaseContext
-//sys	CryptGenRandom(provhandle Handle, buflen uint32, buf *byte) (err error) = advapi32.CryptGenRandom
-//sys	GetEnvironmentStrings() (envs *uint16, err error) [failretval==nil] = kernel32.GetEnvironmentStringsW
-//sys	FreeEnvironmentStrings(envs *uint16) (err error) = kernel32.FreeEnvironmentStringsW
-//sys	GetEnvironmentVariable(name *uint16, buffer *uint16, size uint32) (n uint32, err error) = kernel32.GetEnvironmentVariableW
-//sys	SetEnvironmentVariable(name *uint16, value *uint16) (err error) = kernel32.SetEnvironmentVariableW
+///sys	CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error)
+///sys	GetFileType(filehandle Handle) (n uint32, err error)
+//sys	CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) = CryptAcquireContextW
+//sys	CryptReleaseContext(provhandle Handle, flags uint32) (err error) = CryptReleaseContext
+//sys	CryptGenRandom(provhandle Handle, buflen uint32, buf *byte) (err error) = CryptGenRandom
+///sys	GetEnvironmentStrings() (envs *uint16, err error) [failretval==nil] = GetEnvironmentStringsW
+///sys	FreeEnvironmentStrings(envs *uint16) (err error) = coredll.FreeEnvironmentStringsW
+///sys	GetEnvironmentVariable(name *uint16, buffer *uint16, size uint32) (n uint32, err error) = GetEnvironmentVariableW
+///sys	SetEnvironmentVariable(name *uint16, value *uint16) (err error) = SetEnvironmentVariableW
 //sys	SetFileTime(handle Handle, ctime *Filetime, atime *Filetime, wtime *Filetime) (err error)
-//sys	GetFileAttributes(name *uint16) (attrs uint32, err error) [failretval==INVALID_FILE_ATTRIBUTES] = kernel32.GetFileAttributesW
-//sys	SetFileAttributes(name *uint16, attrs uint32) (err error) = kernel32.SetFileAttributesW
-//sys	GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) = kernel32.GetFileAttributesExW
-//sys	GetCommandLine() (cmd *uint16) = kernel32.GetCommandLineW
-//sys	CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error) [failretval==nil] = shell32.CommandLineToArgvW
+//sys	GetFileAttributes(name *uint16) (attrs uint32, err error) [failretval==INVALID_FILE_ATTRIBUTES] = GetFileAttributesW
+//sys	SetFileAttributes(name *uint16, attrs uint32) (err error) = SetFileAttributesW
+//sys	GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) = GetFileAttributesExW
+//sys	GetCommandLine() (cmd *uint16) = GetCommandLineW
+///sys	CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error) [failretval==nil] = shell32.CommandLineToArgvW
 //sys	LocalFree(hmem Handle) (handle Handle, err error) [failretval!=0]
-//sys	SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error)
+///sys	SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error)
 //sys	FlushFileBuffers(handle Handle) (err error)
-//sys	GetFullPathName(path *uint16, buflen uint32, buf *uint16, fname **uint16) (n uint32, err error) = kernel32.GetFullPathNameW
-//sys	GetLongPathName(path *uint16, buf *uint16, buflen uint32) (n uint32, err error) = kernel32.GetLongPathNameW
-//sys	GetShortPathName(longpath *uint16, shortpath *uint16, buflen uint32) (n uint32, err error) = kernel32.GetShortPathNameW
-//sys	CreateFileMapping(fhandle Handle, sa *SecurityAttributes, prot uint32, maxSizeHigh uint32, maxSizeLow uint32, name *uint16) (handle Handle, err error) = kernel32.CreateFileMappingW
+///sys	GetFullPathName(path *uint16, buflen uint32, buf *uint16, fname **uint16) (n uint32, err error) = GetFullPathNameW
+///sys	GetLongPathName(path *uint16, buf *uint16, buflen uint32) (n uint32, err error) = GetLongPathNameW
+///sys	GetShortPathName(longpath *uint16, shortpath *uint16, buflen uint32) (n uint32, err error) = GetShortPathNameW
+//sys	CreateFileMapping(fhandle Handle, sa *SecurityAttributes, prot uint32, maxSizeHigh uint32, maxSizeLow uint32, name *uint16) (handle Handle, err error) = CreateFileMappingW
 //sys	MapViewOfFile(handle Handle, access uint32, offsetHigh uint32, offsetLow uint32, length uintptr) (addr uintptr, err error)
 //sys	UnmapViewOfFile(addr uintptr) (err error)
 //sys	FlushViewOfFile(addr uintptr, length uintptr) (err error)
-//sys	VirtualLock(addr uintptr, length uintptr) (err error)
-//sys	VirtualUnlock(addr uintptr, length uintptr) (err error)
-//sys	TransmitFile(s Handle, handle Handle, bytesToWrite uint32, bytsPerSend uint32, overlapped *Overlapped, transmitFileBuf *TransmitFileBuffers, flags uint32) (err error) = mswsock.TransmitFile
-//sys	ReadDirectoryChanges(handle Handle, buf *byte, buflen uint32, watchSubTree bool, mask uint32, retlen *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) = kernel32.ReadDirectoryChangesW
+///sys	VirtualLock(addr uintptr, length uintptr) (err error)
+///sys	VirtualUnlock(addr uintptr, length uintptr) (err error)
+///sys	TransmitFile(s Handle, handle Handle, bytesToWrite uint32, bytsPerSend uint32, overlapped *Overlapped, transmitFileBuf *TransmitFileBuffers, flags uint32) (err error) = mswsock.TransmitFile
+///sys	ReadDirectoryChanges(handle Handle, buf *byte, buflen uint32, watchSubTree bool, mask uint32, retlen *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) = ReadDirectoryChangesW
 //sys	CertOpenSystemStore(hprov Handle, name *uint16) (store Handle, err error) = crypt32.CertOpenSystemStoreW
-//sys   CertOpenStore(storeProvider uintptr, msgAndCertEncodingType uint32, cryptProv uintptr, flags uint32, para uintptr) (handle Handle, err error) [failretval==InvalidHandle] = crypt32.CertOpenStore
+//sys	CertOpenStore(storeProvider uintptr, msgAndCertEncodingType uint32, cryptProv uintptr, flags uint32, para uintptr) (handle Handle, err error) [failretval==InvalidHandle] = crypt32.CertOpenStore
 //sys	CertEnumCertificatesInStore(store Handle, prevContext *CertContext) (context *CertContext, err error) [failretval==nil] = crypt32.CertEnumCertificatesInStore
-//sys   CertAddCertificateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) = crypt32.CertAddCertificateContextToStore
+//sys	CertAddCertificateContextToStore(store Handle, certContext *CertContext, addDisposition uint32, storeContext **CertContext) (err error) = crypt32.CertAddCertificateContextToStore
 //sys	CertCloseStore(store Handle, flags uint32) (err error) = crypt32.CertCloseStore
-//sys   CertGetCertificateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) = crypt32.CertGetCertificateChain
-//sys   CertFreeCertificateChain(ctx *CertChainContext) = crypt32.CertFreeCertificateChain
-//sys   CertCreateCertificateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) [failretval==nil] = crypt32.CertCreateCertificateContext
-//sys   CertFreeCertificateContext(ctx *CertContext) (err error) = crypt32.CertFreeCertificateContext
-//sys   CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) = crypt32.CertVerifyCertificateChainPolicy
-//sys	RegOpenKeyEx(key Handle, subkey *uint16, options uint32, desiredAccess uint32, result *Handle) (regerrno error) = advapi32.RegOpenKeyExW
-//sys	RegCloseKey(key Handle) (regerrno error) = advapi32.RegCloseKey
-//sys	RegQueryInfoKey(key Handle, class *uint16, classLen *uint32, reserved *uint32, subkeysLen *uint32, maxSubkeyLen *uint32, maxClassLen *uint32, valuesLen *uint32, maxValueNameLen *uint32, maxValueLen *uint32, saLen *uint32, lastWriteTime *Filetime) (regerrno error) = advapi32.RegQueryInfoKeyW
-//sys	RegEnumKeyEx(key Handle, index uint32, name *uint16, nameLen *uint32, reserved *uint32, class *uint16, classLen *uint32, lastWriteTime *Filetime) (regerrno error) = advapi32.RegEnumKeyExW
-//sys	RegQueryValueEx(key Handle, name *uint16, reserved *uint32, valtype *uint32, buf *byte, buflen *uint32) (regerrno error) = advapi32.RegQueryValueExW
-//sys	getCurrentProcessId() (pid uint32) = kernel32.GetCurrentProcessId
-//sys	GetConsoleMode(console Handle, mode *uint32) (err error) = kernel32.GetConsoleMode
-//sys	WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error) = kernel32.WriteConsoleW
-//sys	ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error) = kernel32.ReadConsoleW
+//sys	CertGetCertificateChain(engine Handle, leaf *CertContext, time *Filetime, additionalStore Handle, para *CertChainPara, flags uint32, reserved uintptr, chainCtx **CertChainContext) (err error) = crypt32.CertGetCertificateChain
+//sys	CertFreeCertificateChain(ctx *CertChainContext) = crypt32.CertFreeCertificateChain
+//sys	CertCreateCertificateContext(certEncodingType uint32, certEncoded *byte, encodedLen uint32) (context *CertContext, err error) [failretval==nil] = crypt32.CertCreateCertificateContext
+//sys	CertFreeCertificateContext(ctx *CertContext) (err error) = crypt32.CertFreeCertificateContext
+///sys  CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) = crypt32.CertVerifyCertificateChainPolicy
+//sys	RegOpenKeyEx(key Handle, subkey *uint16, options uint32, desiredAccess uint32, result *Handle) (regerrno error) = RegOpenKeyExW
+//sys	RegCloseKey(key Handle) (regerrno error) = RegCloseKey
+//sys	RegQueryInfoKey(key Handle, class *uint16, classLen *uint32, reserved *uint32, subkeysLen *uint32, maxSubkeyLen *uint32, maxClassLen *uint32, valuesLen *uint32, maxValueNameLen *uint32, maxValueLen *uint32, saLen *uint32, lastWriteTime *Filetime) (regerrno error) = RegQueryInfoKeyW
+//sys	RegEnumKeyEx(key Handle, index uint32, name *uint16, nameLen *uint32, reserved *uint32, class *uint16, classLen *uint32, lastWriteTime *Filetime) (regerrno error) = RegEnumKeyExW
+//sys	RegQueryValueEx(key Handle, name *uint16, reserved *uint32, valtype *uint32, buf *byte, buflen *uint32) (regerrno error) = RegQueryValueExW
+//sys	GetUserKData(offset uint32) (kdata uint32) = __GetUserKData
+///sys	GetConsoleMode(console Handle, mode *uint32) (err error) = GetConsoleMode
+///sys	WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error) = WriteConsoleW
+///sys	ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error) = ReadConsoleW
 
 // syscall interface implementation for other packages
 
-func Exit(code int) { ExitProcess(uint32(code)) }
+func Exit(code int) { TerminateProcess(^Handle(66), uint32(code)) }
 
+func GetCurrentProcess() (Handle, error) {
+	return ^Handle(66), nil	// pseudo handle 0x42 (SH_CURPROC + SYS_HANDLE_BASE)
+}
+	
 func makeInheritSa() *SecurityAttributes {
 	var sa SecurityAttributes
 	sa.Length = uint32(unsafe.Sizeof(sa))
@@ -310,11 +312,14 @@ func Seek(fd Handle, offset int64, whence int) (newoffset int64, err error) {
 	}
 	hi := int32(offset >> 32)
 	lo := int32(offset)
+	// TODO(sebastian): Implement
+	/*
 	// use GetFileType to check pipe, pipe can't do seek
 	ft, _ := GetFileType(fd)
 	if ft == FILE_TYPE_PIPE {
 		return 0, EPIPE
 	}
+	*/
 	rlo, e := SetFilePointer(fd, lo, &hi, w)
 	if e != nil {
 		return 0, e
@@ -333,15 +338,9 @@ var (
 )
 
 func getStdHandle(h int) (fd Handle) {
-	b := make([]uint16, 300)
-	err1 := GetStdioPath(h, &b[0], uint32(len(b)))
-	if err1 != nil {
-		return InvalidHandle
-	}
-	r, err3 := CreateFile(&b[0], GENERIC_READ | GENERIC_WRITE, 
-		FILE_SHARE_READ | FILE_SHARE_WRITE, nil,
-		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
-	if err3 != nil {
+	var dev uint32 = 1
+	r, err := OpenStdConsole(h, &dev)
+	if err != nil {
 		return InvalidHandle
 	}
 	CloseOnExec(r)
@@ -351,20 +350,28 @@ func getStdHandle(h int) (fd Handle) {
 const ImplementsGetwd = true
 
 func Getwd() (wd string, err error) {
+	// TODO(sebastian): Implement
+	/*
 	b := make([]uint16, 300)
 	n, e := GetCurrentDirectory(uint32(len(b)), &b[0])
 	if e != nil {
 		return "", e
 	}
 	return string(utf16.Decode(b[0:n])), nil
+	*/
+	return "", EWINDOWS
 }
 
 func Chdir(path string) (err error) {
+	// TODO(sebastian): Implement
+	/*
 	pathp, err := UTF16PtrFromString(path)
 	if err != nil {
 		return err
 	}
 	return SetCurrentDirectory(pathp)
+	*/
+	return EWINDOWS
 }
 
 func Mkdir(path string, mode uint32) (err error) {
@@ -404,6 +411,8 @@ func Rename(oldpath, newpath string) (err error) {
 }
 
 func ComputerName() (name string, err error) {
+	// TODO(sebastian): Implement
+	/*
 	var n uint32 = MAX_COMPUTERNAME_LENGTH + 1
 	b := make([]uint16, n)
 	e := GetComputerName(&b[0], &n)
@@ -411,6 +420,8 @@ func ComputerName() (name string, err error) {
 		return "", e
 	}
 	return string(utf16.Decode(b[0:n])), nil
+	*/
+	return "", EWINDOWS
 }
 
 func Ftruncate(fd Handle, length int64) (err error) {
@@ -440,6 +451,8 @@ func Gettimeofday(tv *Timeval) (err error) {
 }
 
 func Pipe(p []Handle) (err error) {
+	// TODO(sebastian): Implement
+	/*
 	if len(p) != 2 {
 		return EINVAL
 	}
@@ -451,6 +464,8 @@ func Pipe(p []Handle) (err error) {
 	p[0] = r
 	p[1] = w
 	return nil
+	*/
+	return EWINDOWS
 }
 
 func Utimes(path string, tv []Timeval) (err error) {
@@ -518,11 +533,19 @@ func Chmod(path string, mode uint32) (err error) {
 }
 
 func LoadCancelIoEx() error {
+	// TODO(sebastian): Implement
+	/*
 	return procCancelIoEx.Find()
+	*/
+	return EWINDOWS
 }
 
 func LoadSetFileCompletionNotificationModes() error {
+	// TODO(sebastian): Implement
+	/*
 	return procSetFileCompletionNotificationModes.Find()
+	*/
+	return EWINDOWS
 }
 
 // net api calls
@@ -558,7 +581,7 @@ const socket_error = uintptr(^uint32(0))
 //sys	FreeAddrInfoW(addrinfo *AddrinfoW) = ws2_32.FreeAddrInfoW
 //sys	GetIfEntry(pIfRow *MibIfRow) (errcode error) = iphlpapi.GetIfEntry
 //sys	GetAdaptersInfo(ai *IpAdapterInfo, ol *uint32) (errcode error) = iphlpapi.GetAdaptersInfo
-//sys	SetFileCompletionNotificationModes(handle Handle, flags uint8) (err error) = kernel32.SetFileCompletionNotificationModes
+//sys	SetFileCompletionNotificationModes(handle Handle, flags uint8) (err error) = coredll.SetFileCompletionNotificationModes
 //sys	WSAEnumProtocols(protocols *int32, protocolBuffer *WSAProtocolInfo, bufferLength *uint32) (n int32, err error) [failretval==-1] = ws2_32.WSAEnumProtocolsW
 
 // For testing: clients can set this flag to force
@@ -886,7 +909,9 @@ func SetsockoptIPMreq(fd Handle, level, opt int, mreq *IPMreq) (err error) {
 }
 func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) { return EWINDOWS }
 
-func Getpid() (pid int) { return int(getCurrentProcessId()) }
+// TODO(sebastian): Check for 64bit!
+// __GetUserKData(SYSHANDLE_OFFSET + (SH_CURPROC * sizeof(HANDLE)));
+func Getpid() (pid int) { return int(GetUserKData(12)) }
 
 func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) {
 	// NOTE(rsc): The Win32finddata struct is wrong for the system call:
@@ -946,3 +971,16 @@ func (s Signal) String() string {
 	}
 	return "signal " + itoa(int(s))
 }
+
+// TODO(sebastian): Find workarounds
+func GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error)										{ return EWINDOWS }
+func CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error)									 													{ return nil, EWINDOWS }
+func GetConsoleMode(console Handle, mode *uint32) (err error)																												{ return EWINDOWS }
+func WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error)																	{ return EWINDOWS }
+func ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error)																	{ return EWINDOWS }
+func GetLongPathName(path *uint16, buf *uint16, buflen uint32) (n uint32, err error)																						{ return 0, EWINDOWS }
+func GetShortPathName(longpath *uint16, shortpath *uint16, buflen uint32) (n uint32, err error)																				{ return 0, EWINDOWS }
+func CancelIo(s Handle) (err error)																																			{ return EWINDOWS }
+func CancelIoEx(s Handle, o *Overlapped) (err error)																														{ return EWINDOWS }
+func TransmitFile(s Handle, handle Handle, bytesToWrite uint32, bytsPerSend uint32, overlapped *Overlapped, transmitFileBuf *TransmitFileBuffers, flags uint32) (err error)	{ return EWINDOWS }
+func CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error)						{ return EWINDOWS }

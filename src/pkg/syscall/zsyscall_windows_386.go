@@ -6,90 +6,61 @@ package syscall
 import "unsafe"
 
 var (
-	modkernel32 = NewLazyDLL("kernel32.dll")
-	modadvapi32 = NewLazyDLL("advapi32.dll")
-	modshell32 = NewLazyDLL("shell32.dll")
-	modmswsock = NewLazyDLL("mswsock.dll")
+	modcoredll = NewLazyDLL("coredll.dll")
 	modcrypt32 = NewLazyDLL("crypt32.dll")
 	modws2_32 = NewLazyDLL("ws2_32.dll")
+	modmswsock = NewLazyDLL("mswsock.dll")
 	moddnsapi = NewLazyDLL("dnsapi.dll")
 	modiphlpapi = NewLazyDLL("iphlpapi.dll")
 	modsecur32 = NewLazyDLL("secur32.dll")
 	modnetapi32 = NewLazyDLL("netapi32.dll")
+	modadvapi32 = NewLazyDLL("advapi32.dll")
 	moduserenv = NewLazyDLL("userenv.dll")
 
-	procGetLastError = modkernel32.NewProc("GetLastError")
-	procLoadLibraryW = modkernel32.NewProc("LoadLibraryW")
-	procFreeLibrary = modkernel32.NewProc("FreeLibrary")
-	procGetProcAddress = modkernel32.NewProc("GetProcAddress")
-	procGetVersion = modkernel32.NewProc("GetVersion")
-	procFormatMessageW = modkernel32.NewProc("FormatMessageW")
-	procExitProcess = modkernel32.NewProc("ExitProcess")
-	procCreateFileW = modkernel32.NewProc("CreateFileW")
-	procReadFile = modkernel32.NewProc("ReadFile")
-	procWriteFile = modkernel32.NewProc("WriteFile")
-	procSetFilePointer = modkernel32.NewProc("SetFilePointer")
-	procCloseHandle = modkernel32.NewProc("CloseHandle")
-	procGetStdioPathW = modkernel32.NewProc("GetStdioPathW")
-	procFindFirstFileW = modkernel32.NewProc("FindFirstFileW")
-	procFindNextFileW = modkernel32.NewProc("FindNextFileW")
-	procFindClose = modkernel32.NewProc("FindClose")
-	procGetFileInformationByHandle = modkernel32.NewProc("GetFileInformationByHandle")
-	procGetCurrentDirectoryW = modkernel32.NewProc("GetCurrentDirectoryW")
-	procSetCurrentDirectoryW = modkernel32.NewProc("SetCurrentDirectoryW")
-	procCreateDirectoryW = modkernel32.NewProc("CreateDirectoryW")
-	procRemoveDirectoryW = modkernel32.NewProc("RemoveDirectoryW")
-	procDeleteFileW = modkernel32.NewProc("DeleteFileW")
-	procMoveFileW = modkernel32.NewProc("MoveFileW")
-	procGetComputerNameW = modkernel32.NewProc("GetComputerNameW")
-	procSetEndOfFile = modkernel32.NewProc("SetEndOfFile")
-	procGetSystemTime = modkernel32.NewProc("GetSystemTime")
-	procSystemTimeToFileTime = modkernel32.NewProc("SystemTimeToFileTime")
-	procGetTimeZoneInformation = modkernel32.NewProc("GetTimeZoneInformation")
-	procCreateIoCompletionPort = modkernel32.NewProc("CreateIoCompletionPort")
-	procGetQueuedCompletionStatus = modkernel32.NewProc("GetQueuedCompletionStatus")
-	procPostQueuedCompletionStatus = modkernel32.NewProc("PostQueuedCompletionStatus")
-	procCancelIo = modkernel32.NewProc("CancelIo")
-	procCancelIoEx = modkernel32.NewProc("CancelIoEx")
-	procCreateProcessW = modkernel32.NewProc("CreateProcessW")
-	procOpenProcess = modkernel32.NewProc("OpenProcess")
-	procTerminateProcess = modkernel32.NewProc("TerminateProcess")
-	procGetExitCodeProcess = modkernel32.NewProc("GetExitCodeProcess")
-	procGetStartupInfoW = modkernel32.NewProc("GetStartupInfoW")
-	procGetCurrentProcess = modkernel32.NewProc("GetCurrentProcess")
-	procGetProcessTimes = modkernel32.NewProc("GetProcessTimes")
-	procDuplicateHandle = modkernel32.NewProc("DuplicateHandle")
-	procWaitForSingleObject = modkernel32.NewProc("WaitForSingleObject")
-	procGetTempPathW = modkernel32.NewProc("GetTempPathW")
-	procCreatePipe = modkernel32.NewProc("CreatePipe")
-	procGetFileType = modkernel32.NewProc("GetFileType")
-	procCryptAcquireContextW = modadvapi32.NewProc("CryptAcquireContextW")
-	procCryptReleaseContext = modadvapi32.NewProc("CryptReleaseContext")
-	procCryptGenRandom = modadvapi32.NewProc("CryptGenRandom")
-	procGetEnvironmentStringsW = modkernel32.NewProc("GetEnvironmentStringsW")
-	procFreeEnvironmentStringsW = modkernel32.NewProc("FreeEnvironmentStringsW")
-	procGetEnvironmentVariableW = modkernel32.NewProc("GetEnvironmentVariableW")
-	procSetEnvironmentVariableW = modkernel32.NewProc("SetEnvironmentVariableW")
-	procSetFileTime = modkernel32.NewProc("SetFileTime")
-	procGetFileAttributesW = modkernel32.NewProc("GetFileAttributesW")
-	procSetFileAttributesW = modkernel32.NewProc("SetFileAttributesW")
-	procGetFileAttributesExW = modkernel32.NewProc("GetFileAttributesExW")
-	procGetCommandLineW = modkernel32.NewProc("GetCommandLineW")
-	procCommandLineToArgvW = modshell32.NewProc("CommandLineToArgvW")
-	procLocalFree = modkernel32.NewProc("LocalFree")
-	procSetHandleInformation = modkernel32.NewProc("SetHandleInformation")
-	procFlushFileBuffers = modkernel32.NewProc("FlushFileBuffers")
-	procGetFullPathNameW = modkernel32.NewProc("GetFullPathNameW")
-	procGetLongPathNameW = modkernel32.NewProc("GetLongPathNameW")
-	procGetShortPathNameW = modkernel32.NewProc("GetShortPathNameW")
-	procCreateFileMappingW = modkernel32.NewProc("CreateFileMappingW")
-	procMapViewOfFile = modkernel32.NewProc("MapViewOfFile")
-	procUnmapViewOfFile = modkernel32.NewProc("UnmapViewOfFile")
-	procFlushViewOfFile = modkernel32.NewProc("FlushViewOfFile")
-	procVirtualLock = modkernel32.NewProc("VirtualLock")
-	procVirtualUnlock = modkernel32.NewProc("VirtualUnlock")
-	procTransmitFile = modmswsock.NewProc("TransmitFile")
-	procReadDirectoryChangesW = modkernel32.NewProc("ReadDirectoryChangesW")
+	procGetLastError = modcoredll.NewProc("GetLastError")
+	procLoadLibraryW = modcoredll.NewProc("LoadLibraryW")
+	procFreeLibrary = modcoredll.NewProc("FreeLibrary")
+	procGetProcAddressA = modcoredll.NewProc("GetProcAddressA")
+	procFormatMessageW = modcoredll.NewProc("FormatMessageW")
+	procCreateFileW = modcoredll.NewProc("CreateFileW")
+	procReadFile = modcoredll.NewProc("ReadFile")
+	procWriteFile = modcoredll.NewProc("WriteFile")
+	procSetFilePointer = modcoredll.NewProc("SetFilePointer")
+	procCloseHandle = modcoredll.NewProc("CloseHandle")
+	procOpenStdConsole = modcoredll.NewProc("OpenStdConsole")
+	procFindFirstFileW = modcoredll.NewProc("FindFirstFileW")
+	procFindNextFileW = modcoredll.NewProc("FindNextFileW")
+	procFindClose = modcoredll.NewProc("FindClose")
+	procGetFileInformationByHandle = modcoredll.NewProc("GetFileInformationByHandle")
+	procCreateDirectoryW = modcoredll.NewProc("CreateDirectoryW")
+	procRemoveDirectoryW = modcoredll.NewProc("RemoveDirectoryW")
+	procDeleteFileW = modcoredll.NewProc("DeleteFileW")
+	procMoveFileW = modcoredll.NewProc("MoveFileW")
+	procSetEndOfFile = modcoredll.NewProc("SetEndOfFile")
+	procGetSystemTime = modcoredll.NewProc("GetSystemTime")
+	procSystemTimeToFileTime = modcoredll.NewProc("SystemTimeToFileTime")
+	procGetTimeZoneInformation = modcoredll.NewProc("GetTimeZoneInformation")
+	procCreateProcessW = modcoredll.NewProc("CreateProcessW")
+	procOpenProcess = modcoredll.NewProc("OpenProcess")
+	procTerminateProcess = modcoredll.NewProc("TerminateProcess")
+	procGetExitCodeProcess = modcoredll.NewProc("GetExitCodeProcess")
+	procDuplicateHandle = modcoredll.NewProc("DuplicateHandle")
+	procWaitForSingleObject = modcoredll.NewProc("WaitForSingleObject")
+	procGetTempPathW = modcoredll.NewProc("GetTempPathW")
+	procCryptAcquireContextW = modcoredll.NewProc("CryptAcquireContextW")
+	procCryptReleaseContext = modcoredll.NewProc("CryptReleaseContext")
+	procCryptGenRandom = modcoredll.NewProc("CryptGenRandom")
+	procSetFileTime = modcoredll.NewProc("SetFileTime")
+	procGetFileAttributesW = modcoredll.NewProc("GetFileAttributesW")
+	procSetFileAttributesW = modcoredll.NewProc("SetFileAttributesW")
+	procGetFileAttributesExW = modcoredll.NewProc("GetFileAttributesExW")
+	procGetCommandLineW = modcoredll.NewProc("GetCommandLineW")
+	procLocalFree = modcoredll.NewProc("LocalFree")
+	procFlushFileBuffers = modcoredll.NewProc("FlushFileBuffers")
+	procCreateFileMappingW = modcoredll.NewProc("CreateFileMappingW")
+	procMapViewOfFile = modcoredll.NewProc("MapViewOfFile")
+	procUnmapViewOfFile = modcoredll.NewProc("UnmapViewOfFile")
+	procFlushViewOfFile = modcoredll.NewProc("FlushViewOfFile")
 	procCertOpenSystemStoreW = modcrypt32.NewProc("CertOpenSystemStoreW")
 	procCertOpenStore = modcrypt32.NewProc("CertOpenStore")
 	procCertEnumCertificatesInStore = modcrypt32.NewProc("CertEnumCertificatesInStore")
@@ -99,16 +70,12 @@ var (
 	procCertFreeCertificateChain = modcrypt32.NewProc("CertFreeCertificateChain")
 	procCertCreateCertificateContext = modcrypt32.NewProc("CertCreateCertificateContext")
 	procCertFreeCertificateContext = modcrypt32.NewProc("CertFreeCertificateContext")
-	procCertVerifyCertificateChainPolicy = modcrypt32.NewProc("CertVerifyCertificateChainPolicy")
-	procRegOpenKeyExW = modadvapi32.NewProc("RegOpenKeyExW")
-	procRegCloseKey = modadvapi32.NewProc("RegCloseKey")
-	procRegQueryInfoKeyW = modadvapi32.NewProc("RegQueryInfoKeyW")
-	procRegEnumKeyExW = modadvapi32.NewProc("RegEnumKeyExW")
-	procRegQueryValueExW = modadvapi32.NewProc("RegQueryValueExW")
-	procGetCurrentProcessId = modkernel32.NewProc("GetCurrentProcessId")
-	procGetConsoleMode = modkernel32.NewProc("GetConsoleMode")
-	procWriteConsoleW = modkernel32.NewProc("WriteConsoleW")
-	procReadConsoleW = modkernel32.NewProc("ReadConsoleW")
+	procRegOpenKeyExW = modcoredll.NewProc("RegOpenKeyExW")
+	procRegCloseKey = modcoredll.NewProc("RegCloseKey")
+	procRegQueryInfoKeyW = modcoredll.NewProc("RegQueryInfoKeyW")
+	procRegEnumKeyExW = modcoredll.NewProc("RegEnumKeyExW")
+	procRegQueryValueExW = modcoredll.NewProc("RegQueryValueExW")
+	proc__GetUserKData = modcoredll.NewProc("__GetUserKData")
 	procWSAStartup = modws2_32.NewProc("WSAStartup")
 	procWSACleanup = modws2_32.NewProc("WSACleanup")
 	procWSAIoctl = modws2_32.NewProc("WSAIoctl")
@@ -138,7 +105,7 @@ var (
 	procFreeAddrInfoW = modws2_32.NewProc("FreeAddrInfoW")
 	procGetIfEntry = modiphlpapi.NewProc("GetIfEntry")
 	procGetAdaptersInfo = modiphlpapi.NewProc("GetAdaptersInfo")
-	procSetFileCompletionNotificationModes = modkernel32.NewProc("SetFileCompletionNotificationModes")
+	procSetFileCompletionNotificationModes = modcoredll.NewProc("SetFileCompletionNotificationModes")
 	procWSAEnumProtocolsW = modws2_32.NewProc("WSAEnumProtocolsW")
 	procTranslateNameW = modsecur32.NewProc("TranslateNameW")
 	procGetUserNameExW = modsecur32.NewProc("GetUserNameExW")
@@ -201,22 +168,9 @@ func GetProcAddress(module Handle, procname string) (proc uintptr, err error) {
 	if err != nil {
 		return
 	}
-	r0, _, e1 := Syscall(procGetProcAddress.Addr(), 2, uintptr(module), uintptr(unsafe.Pointer(_p0)), 0)
+	r0, _, e1 := Syscall(procGetProcAddressA.Addr(), 2, uintptr(module), uintptr(unsafe.Pointer(_p0)), 0)
 	proc = uintptr(r0)
 	if proc == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetVersion() (ver uint32, err error) {
-	r0, _, e1 := Syscall(procGetVersion.Addr(), 0, 0, 0, 0)
-	ver = uint32(r0)
-	if ver == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
@@ -240,11 +194,6 @@ func FormatMessage(flags uint32, msgsrc uint32, msgid uint32, langid uint32, buf
 			err = EINVAL
 		}
 	}
-	return
-}
-
-func ExitProcess(exitcode uint32) {
-	Syscall(procExitProcess.Addr(), 1, uintptr(exitcode), 0, 0)
 	return
 }
 
@@ -318,9 +267,10 @@ func CloseHandle(handle Handle) (err error) {
 	return
 }
 
-func GetStdioPath(stdhandle int, buf *uint16, buflen uint32) (err error) {
-	r1, _, e1 := Syscall(procGetStdioPathW.Addr(), 3, uintptr(stdhandle), uintptr(unsafe.Pointer(buf)), uintptr(buflen))
-	if r1 == 0 {
+func OpenStdConsole(stdhandle int, dev *uint32) (handle Handle, err error) {
+	r0, _, e1 := Syscall(procOpenStdConsole.Addr(), 2, uintptr(stdhandle), uintptr(unsafe.Pointer(dev)), 0)
+	handle = Handle(r0)
+	if handle == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
@@ -379,31 +329,6 @@ func GetFileInformationByHandle(handle Handle, data *ByHandleFileInformation) (e
 	return
 }
 
-func GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) {
-	r0, _, e1 := Syscall(procGetCurrentDirectoryW.Addr(), 2, uintptr(buflen), uintptr(unsafe.Pointer(buf)), 0)
-	n = uint32(r0)
-	if n == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func SetCurrentDirectory(path *uint16) (err error) {
-	r1, _, e1 := Syscall(procSetCurrentDirectoryW.Addr(), 1, uintptr(unsafe.Pointer(path)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func CreateDirectory(path *uint16, sa *SecurityAttributes) (err error) {
 	r1, _, e1 := Syscall(procCreateDirectoryW.Addr(), 2, uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(sa)), 0)
 	if r1 == 0 {
@@ -452,18 +377,6 @@ func MoveFile(from *uint16, to *uint16) (err error) {
 	return
 }
 
-func GetComputerName(buf *uint16, n *uint32) (err error) {
-	r1, _, e1 := Syscall(procGetComputerNameW.Addr(), 2, uintptr(unsafe.Pointer(buf)), uintptr(unsafe.Pointer(n)), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func SetEndOfFile(handle Handle) (err error) {
 	r1, _, e1 := Syscall(procSetEndOfFile.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
@@ -490,67 +403,6 @@ func GetTimeZoneInformation(tzi *Timezoneinformation) (rc uint32, err error) {
 	r0, _, e1 := Syscall(procGetTimeZoneInformation.Addr(), 1, uintptr(unsafe.Pointer(tzi)), 0, 0)
 	rc = uint32(r0)
 	if rc == 0xffffffff {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func CreateIoCompletionPort(filehandle Handle, cphandle Handle, key uint32, threadcnt uint32) (handle Handle, err error) {
-	r0, _, e1 := Syscall6(procCreateIoCompletionPort.Addr(), 4, uintptr(filehandle), uintptr(cphandle), uintptr(key), uintptr(threadcnt), 0, 0)
-	handle = Handle(r0)
-	if handle == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetQueuedCompletionStatus(cphandle Handle, qty *uint32, key *uint32, overlapped **Overlapped, timeout uint32) (err error) {
-	r1, _, e1 := Syscall6(procGetQueuedCompletionStatus.Addr(), 5, uintptr(cphandle), uintptr(unsafe.Pointer(qty)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(overlapped)), uintptr(timeout), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func PostQueuedCompletionStatus(cphandle Handle, qty uint32, key uint32, overlapped *Overlapped) (err error) {
-	r1, _, e1 := Syscall6(procPostQueuedCompletionStatus.Addr(), 4, uintptr(cphandle), uintptr(qty), uintptr(key), uintptr(unsafe.Pointer(overlapped)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func CancelIo(s Handle) (err error) {
-	r1, _, e1 := Syscall(procCancelIo.Addr(), 1, uintptr(s), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func CancelIoEx(s Handle, o *Overlapped) (err error) {
-	r1, _, e1 := Syscall(procCancelIoEx.Addr(), 2, uintptr(s), uintptr(unsafe.Pointer(o)), 0)
-	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
@@ -621,43 +473,6 @@ func GetExitCodeProcess(handle Handle, exitcode *uint32) (err error) {
 	return
 }
 
-func GetStartupInfo(startupInfo *StartupInfo) (err error) {
-	r1, _, e1 := Syscall(procGetStartupInfoW.Addr(), 1, uintptr(unsafe.Pointer(startupInfo)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetCurrentProcess() (pseudoHandle Handle, err error) {
-	r0, _, e1 := Syscall(procGetCurrentProcess.Addr(), 0, 0, 0, 0)
-	pseudoHandle = Handle(r0)
-	if pseudoHandle == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetProcessTimes(handle Handle, creationTime *Filetime, exitTime *Filetime, kernelTime *Filetime, userTime *Filetime) (err error) {
-	r1, _, e1 := Syscall6(procGetProcessTimes.Addr(), 5, uintptr(handle), uintptr(unsafe.Pointer(creationTime)), uintptr(unsafe.Pointer(exitTime)), uintptr(unsafe.Pointer(kernelTime)), uintptr(unsafe.Pointer(userTime)), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func DuplicateHandle(hSourceProcessHandle Handle, hSourceHandle Handle, hTargetProcessHandle Handle, lpTargetHandle *Handle, dwDesiredAccess uint32, bInheritHandle bool, dwOptions uint32) (err error) {
 	var _p0 uint32
 	if bInheritHandle {
@@ -702,31 +517,6 @@ func GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) {
 	return
 }
 
-func CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error) {
-	r1, _, e1 := Syscall6(procCreatePipe.Addr(), 4, uintptr(unsafe.Pointer(readhandle)), uintptr(unsafe.Pointer(writehandle)), uintptr(unsafe.Pointer(sa)), uintptr(size), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetFileType(filehandle Handle) (n uint32, err error) {
-	r0, _, e1 := Syscall(procGetFileType.Addr(), 1, uintptr(filehandle), 0, 0)
-	n = uint32(r0)
-	if n == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) {
 	r1, _, e1 := Syscall6(procCryptAcquireContextW.Addr(), 5, uintptr(unsafe.Pointer(provhandle)), uintptr(unsafe.Pointer(container)), uintptr(unsafe.Pointer(provider)), uintptr(provtype), uintptr(flags), 0)
 	if r1 == 0 {
@@ -753,56 +543,6 @@ func CryptReleaseContext(provhandle Handle, flags uint32) (err error) {
 
 func CryptGenRandom(provhandle Handle, buflen uint32, buf *byte) (err error) {
 	r1, _, e1 := Syscall(procCryptGenRandom.Addr(), 3, uintptr(provhandle), uintptr(buflen), uintptr(unsafe.Pointer(buf)))
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetEnvironmentStrings() (envs *uint16, err error) {
-	r0, _, e1 := Syscall(procGetEnvironmentStringsW.Addr(), 0, 0, 0, 0)
-	envs = (*uint16)(unsafe.Pointer(r0))
-	if envs == nil {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func FreeEnvironmentStrings(envs *uint16) (err error) {
-	r1, _, e1 := Syscall(procFreeEnvironmentStringsW.Addr(), 1, uintptr(unsafe.Pointer(envs)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetEnvironmentVariable(name *uint16, buffer *uint16, size uint32) (n uint32, err error) {
-	r0, _, e1 := Syscall(procGetEnvironmentVariableW.Addr(), 3, uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(buffer)), uintptr(size))
-	n = uint32(r0)
-	if n == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func SetEnvironmentVariable(name *uint16, value *uint16) (err error) {
-	r1, _, e1 := Syscall(procSetEnvironmentVariableW.Addr(), 2, uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(value)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
@@ -868,19 +608,6 @@ func GetCommandLine() (cmd *uint16) {
 	return
 }
 
-func CommandLineToArgv(cmd *uint16, argc *int32) (argv *[8192]*[8192]uint16, err error) {
-	r0, _, e1 := Syscall(procCommandLineToArgvW.Addr(), 2, uintptr(unsafe.Pointer(cmd)), uintptr(unsafe.Pointer(argc)), 0)
-	argv = (*[8192]*[8192]uint16)(unsafe.Pointer(r0))
-	if argv == nil {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func LocalFree(hmem Handle) (handle Handle, err error) {
 	r0, _, e1 := Syscall(procLocalFree.Addr(), 1, uintptr(hmem), 0, 0)
 	handle = Handle(r0)
@@ -894,60 +621,9 @@ func LocalFree(hmem Handle) (handle Handle, err error) {
 	return
 }
 
-func SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error) {
-	r1, _, e1 := Syscall(procSetHandleInformation.Addr(), 3, uintptr(handle), uintptr(mask), uintptr(flags))
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func FlushFileBuffers(handle Handle) (err error) {
 	r1, _, e1 := Syscall(procFlushFileBuffers.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetFullPathName(path *uint16, buflen uint32, buf *uint16, fname **uint16) (n uint32, err error) {
-	r0, _, e1 := Syscall6(procGetFullPathNameW.Addr(), 4, uintptr(unsafe.Pointer(path)), uintptr(buflen), uintptr(unsafe.Pointer(buf)), uintptr(unsafe.Pointer(fname)), 0, 0)
-	n = uint32(r0)
-	if n == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetLongPathName(path *uint16, buf *uint16, buflen uint32) (n uint32, err error) {
-	r0, _, e1 := Syscall(procGetLongPathNameW.Addr(), 3, uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(buf)), uintptr(buflen))
-	n = uint32(r0)
-	if n == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func GetShortPathName(longpath *uint16, shortpath *uint16, buflen uint32) (n uint32, err error) {
-	r0, _, e1 := Syscall(procGetShortPathNameW.Addr(), 3, uintptr(unsafe.Pointer(longpath)), uintptr(unsafe.Pointer(shortpath)), uintptr(buflen))
-	n = uint32(r0)
-	if n == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {
@@ -997,60 +673,6 @@ func UnmapViewOfFile(addr uintptr) (err error) {
 
 func FlushViewOfFile(addr uintptr, length uintptr) (err error) {
 	r1, _, e1 := Syscall(procFlushViewOfFile.Addr(), 2, uintptr(addr), uintptr(length), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func VirtualLock(addr uintptr, length uintptr) (err error) {
-	r1, _, e1 := Syscall(procVirtualLock.Addr(), 2, uintptr(addr), uintptr(length), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func VirtualUnlock(addr uintptr, length uintptr) (err error) {
-	r1, _, e1 := Syscall(procVirtualUnlock.Addr(), 2, uintptr(addr), uintptr(length), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func TransmitFile(s Handle, handle Handle, bytesToWrite uint32, bytsPerSend uint32, overlapped *Overlapped, transmitFileBuf *TransmitFileBuffers, flags uint32) (err error) {
-	r1, _, e1 := Syscall9(procTransmitFile.Addr(), 7, uintptr(s), uintptr(handle), uintptr(bytesToWrite), uintptr(bytsPerSend), uintptr(unsafe.Pointer(overlapped)), uintptr(unsafe.Pointer(transmitFileBuf)), uintptr(flags), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func ReadDirectoryChanges(handle Handle, buf *byte, buflen uint32, watchSubTree bool, mask uint32, retlen *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) {
-	var _p0 uint32
-	if watchSubTree {
-		_p0 = 1
-	} else {
-		_p0 = 0
-	}
-	r1, _, e1 := Syscall9(procReadDirectoryChangesW.Addr(), 8, uintptr(handle), uintptr(unsafe.Pointer(buf)), uintptr(buflen), uintptr(_p0), uintptr(mask), uintptr(unsafe.Pointer(retlen)), uintptr(unsafe.Pointer(overlapped)), uintptr(completionRoutine), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
@@ -1166,18 +788,6 @@ func CertFreeCertificateContext(ctx *CertContext) (err error) {
 	return
 }
 
-func CertVerifyCertificateChainPolicy(policyOID uintptr, chain *CertChainContext, para *CertChainPolicyPara, status *CertChainPolicyStatus) (err error) {
-	r1, _, e1 := Syscall6(procCertVerifyCertificateChainPolicy.Addr(), 4, uintptr(policyOID), uintptr(unsafe.Pointer(chain)), uintptr(unsafe.Pointer(para)), uintptr(unsafe.Pointer(status)), 0, 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
 func RegOpenKeyEx(key Handle, subkey *uint16, options uint32, desiredAccess uint32, result *Handle) (regerrno error) {
 	r0, _, _ := Syscall6(procRegOpenKeyExW.Addr(), 5, uintptr(key), uintptr(unsafe.Pointer(subkey)), uintptr(options), uintptr(desiredAccess), uintptr(unsafe.Pointer(result)), 0)
 	if r0 != 0 {
@@ -1218,45 +828,9 @@ func RegQueryValueEx(key Handle, name *uint16, reserved *uint32, valtype *uint32
 	return
 }
 
-func getCurrentProcessId() (pid uint32) {
-	r0, _, _ := Syscall(procGetCurrentProcessId.Addr(), 0, 0, 0, 0)
-	pid = uint32(r0)
-	return
-}
-
-func GetConsoleMode(console Handle, mode *uint32) (err error) {
-	r1, _, e1 := Syscall(procGetConsoleMode.Addr(), 2, uintptr(console), uintptr(unsafe.Pointer(mode)), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error) {
-	r1, _, e1 := Syscall6(procWriteConsoleW.Addr(), 5, uintptr(console), uintptr(unsafe.Pointer(buf)), uintptr(towrite), uintptr(unsafe.Pointer(written)), uintptr(unsafe.Pointer(reserved)), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
-	return
-}
-
-func ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error) {
-	r1, _, e1 := Syscall6(procReadConsoleW.Addr(), 5, uintptr(console), uintptr(unsafe.Pointer(buf)), uintptr(toread), uintptr(unsafe.Pointer(read)), uintptr(unsafe.Pointer(inputControl)), 0)
-	if r1 == 0 {
-		if e1 != 0 {
-			err = error(e1)
-		} else {
-			err = EINVAL
-		}
-	}
+func GetUserKData(offset uint32) (kdata uint32) {
+	r0, _, _ := Syscall(proc__GetUserKData.Addr(), 1, uintptr(offset), 0, 0)
+	kdata = uint32(r0)
 	return
 }
 

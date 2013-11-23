@@ -96,7 +96,7 @@ while(<>) {
 
 	# Dll file name.
 	if($modname eq "") {
-		$modname = "kernel32";
+		$modname = "coredll";
 	}
 	my $modvname = "mod$modname";
 	if($modnames !~ /$modname/) {

@@ -17,8 +17,8 @@ enum {
 	PAGE_READWRITE = 0x0004,
 };
 
-#pragma dynimport runtime·VirtualAlloc VirtualAlloc "kernel32.dll"
-#pragma dynimport runtime·VirtualFree VirtualFree "kernel32.dll"
+#pragma dynimport runtime·VirtualAlloc VirtualAlloc "coredll.dll"
+#pragma dynimport runtime·VirtualFree VirtualFree "coredll.dll"
 extern void *runtime·VirtualAlloc;
 extern void *runtime·VirtualFree;
 

@@ -122,7 +122,8 @@ func createEnvBlock(envv []string) *uint16 {
 }
 
 func CloseOnExec(fd Handle) {
-	SetHandleInformation(Handle(fd), HANDLE_FLAG_INHERIT, 0)
+	// TODO(sebastian): Implement
+	//SetHandleInformation(Handle(fd), HANDLE_FLAG_INHERIT, 0)
 }
 
 func SetNonblock(fd Handle, nonblocking bool) (err error) {
@@ -131,6 +132,8 @@ func SetNonblock(fd Handle, nonblocking bool) (err error) {
 
 // getFullPath retrieves the full path of the specified file.
 // Just a wrapper for Windows GetFullPathName api.
+// TODO(sebastian): Implement
+/*
 func getFullPath(name string) (path string, err error) {
 	p, err := UTF16PtrFromString(name)
 	if err != nil {
@@ -154,11 +157,12 @@ func getFullPath(name string) (path string, err error) {
 	}
 	return UTF16ToString(buf[:n]), nil
 }
-
+*/
 func isSlash(c uint8) bool {
 	return c == '\\' || c == '/'
 }
-
+// TODO(sebastian): Implement
+/*
 func normalizeDir(dir string) (name string, err error) {
 	ndir, err := getFullPath(dir)
 	if err != nil {
@@ -170,14 +174,15 @@ func normalizeDir(dir string) (name string, err error) {
 	}
 	return ndir, nil
 }
-
+*/
 func volToUpper(ch int) int {
 	if 'a' <= ch && ch <= 'z' {
 		ch += 'A' - 'a'
 	}
 	return ch
 }
-
+// TODO(sebastian): Implement
+/*
 func joinExeDirAndFName(dir, p string) (name string, err error) {
 	if len(p) == 0 {
 		return "", EINVAL
@@ -219,7 +224,7 @@ func joinExeDirAndFName(dir, p string) (name string, err error) {
 	// we shouldn't be here
 	return "", EINVAL
 }
-
+*/
 type ProcAttr struct {
 	Dir   string
 	Env   []string
@@ -259,11 +264,16 @@ func StartProcess(argv0 string, argv []string, attr *ProcAttr) (pid int, handle 
 		// argv0 relative to the current directory, and, only once the new
 		// process is started, it does Chdir(attr.Dir). We are adjusting
 		// for that difference here by making argv0 absolute.
+		
+		// TODO(sebastian): Implement
+		/*
 		var err error
 		argv0, err = joinExeDirAndFName(attr.Dir, argv0)
 		if err != nil {
 			return 0, 0, err
 		}
+		*/
+		argv0 = "\\Temp\\hello.exe"
 	}
 	argv0p, err := UTF16PtrFromString(argv0)
 	if err != nil {

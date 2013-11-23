@@ -41,22 +41,23 @@ TEXT runtime·asmstdcall(SB),NOSPLIT,$0
 
 TEXT	runtime·badsignal2(SB),NOSPLIT,$24
 	// stderr
-	MOVL	$-12, 0(SP)
-	MOVL	SP, BP
-	CALL	*runtime·GetStdHandle(SB)
-	MOVL	BP, SP
+	// TODO(sebastian): Repleace with OpenStdConsole
+	//MOVL	$-12, 0(SP)
+	//MOVL	SP, BP
+	//CALL	*runtime·GetStdHandle(SB)
+	//MOVL	BP, SP
 
-	MOVL	AX, 0(SP)	// handle
-	MOVL	$runtime·badsignalmsg(SB), DX // pointer
-	MOVL	DX, 4(SP)
-	MOVL	runtime·badsignallen(SB), DX // count
-	MOVL	DX, 8(SP)
-	LEAL	20(SP), DX  // written count
-	MOVL	$0, 0(DX)
-	MOVL	DX, 12(SP)
-	MOVL	$0, 16(SP) // overlapped
-	CALL	*runtime·WriteFile(SB)
-	MOVL	BP, SI
+	//MOVL	AX, 0(SP)	// handle
+	//MOVL	$runtime·badsignalmsg(SB), DX // pointer
+	//MOVL	DX, 4(SP)
+	//MOVL	runtime·badsignallen(SB), DX // count
+	//MOVL	DX, 8(SP)
+	//LEAL	20(SP), DX  // written count
+	//MOVL	$0, 0(DX)
+	//MOVL	DX, 12(SP)
+	//MOVL	$0, 16(SP) // overlapped
+	//CALL	*runtime·WriteFile(SB)
+	//MOVL	BP, SI
 	RET
 
 // faster get/set last error

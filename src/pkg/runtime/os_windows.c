@@ -8,39 +8,29 @@
 #include "os_GOOS.h"
 #include "../../cmd/ld/textflag.h"
 
-#pragma dynimport runtime·CloseHandle CloseHandle "kernel32.dll"
-#pragma dynimport runtime·CreateEvent CreateEventA "kernel32.dll"
-#pragma dynimport runtime·CreateThread CreateThread "kernel32.dll"
-//#pragma dynimport runtime·CreateWaitableTimer CreateWaitableTimerA "kernel32.dll"
-#pragma dynimport runtime·CryptAcquireContextW CryptAcquireContextW "advapi32.dll"
-#pragma dynimport runtime·CryptGenRandom CryptGenRandom "advapi32.dll"
-#pragma dynimport runtime·CryptReleaseContext CryptReleaseContext "advapi32.dll"
-#pragma dynimport runtime·DuplicateHandle DuplicateHandle "kernel32.dll"
-#pragma dynimport runtime·ExitProcess ExitProcess "kernel32.dll"
-//#pragma dynimport runtime·FreeEnvironmentStringsW FreeEnvironmentStringsW "kernel32.dll"
-//#pragma dynimport runtime·GetEnvironmentStringsW GetEnvironmentStringsW "kernel32.dll"
-#pragma dynimport runtime·GetProcAddress GetProcAddress "kernel32.dll"
-#pragma dynimport runtime·GetStdPathW GetStdioPathW "kernel32.dll"
-#pragma dynimport runtime·GetSystemInfo GetSystemInfo "kernel32.dll"
-#pragma dynimport runtime·GetSystemTime GetSystemTime "kernel32.dll"
-#pragma dynimport runtime·SystemTimeToFileTime SystemTimeToFileTime "kernel32.dll"
-//#pragma dynimport runtime·GetSystemTimeAsFileTime GetSystemTimeAsFileTime "kernel32.dll"
-#pragma dynimport runtime·GetThreadContext GetThreadContext "kernel32.dll"
-#pragma dynimport runtime·LoadLibrary LoadLibraryW "kernel32.dll"
-#pragma dynimport runtime·LoadLibraryA LoadLibraryA "kernel32.dll"
-#pragma dynimport runtime·ResumeThread ResumeThread "kernel32.dll"
-//#pragma dynimport runtime·SetConsoleCtrlHandler SetConsoleCtrlHandler "kernel32.dll"
-#pragma dynimport runtime·SetEvent SetEvent "kernel32.dll"
-#pragma dynimport runtime·SetThreadPriority SetThreadPriority "kernel32.dll"
-//#pragma dynimport runtime·SetWaitableTimer SetWaitableTimer "kernel32.dll"
-#pragma dynimport runtime·Sleep Sleep "kernel32.dll"
-#pragma dynimport runtime·SuspendThread SuspendThread "kernel32.dll"
-#pragma dynimport runtime·timeBeginPeriod timeBeginPeriod "winmm.dll"
-#pragma dynimport runtime·WaitForSingleObject WaitForSingleObject "kernel32.dll"
-#pragma dynimport runtime·WriteFile WriteFile "kernel32.dll"
-//#pragma dynimport runtime·NtWaitForSingleObject NtWaitForSingleObject "ntdll.dll"
-
-//extern void *runtime·NtWaitForSingleObject;
+#pragma dynimport runtime·CloseHandle CloseHandle "coredll.dll"
+#pragma dynimport runtime·CreateEvent CreateEventW "coredll.dll"
+#pragma dynimport runtime·CreateThread CreateThread "coredll.dll"
+#pragma dynimport runtime·CryptAcquireContextW CryptAcquireContextW "coredll.dll"
+#pragma dynimport runtime·CryptGenRandom CryptGenRandom "coredll.dll"
+#pragma dynimport runtime·CryptReleaseContext CryptReleaseContext "coredll.dll"
+#pragma dynimport runtime·DuplicateHandle DuplicateHandle "coredll.dll"
+#pragma dynimport runtime·TerminateProcess TerminateProcess "coredll.dll"
+#pragma dynimport runtime·GetProcAddress GetProcAddressA "coredll.dll"
+#pragma dynimport runtime·OpenStdConsole OpenStdConsole "coredll.dll"
+#pragma dynimport runtime·GetSystemInfo GetSystemInfo "coredll.dll"
+#pragma dynimport runtime·GetSystemTime GetSystemTime "coredll.dll"
+#pragma dynimport runtime·SystemTimeToFileTime SystemTimeToFileTime "coredll.dll"
+#pragma dynimport runtime·GetThreadContext GetThreadContext "coredll.dll"
+#pragma dynimport runtime·LoadLibrary LoadLibraryW "coredll.dll"
+#pragma dynimport runtime·ResumeThread ResumeThread "coredll.dll"
+#pragma dynimport runtime·EventModify EventModify "coredll.dll"
+#pragma dynimport runtime·SetThreadPriority SetThreadPriority "coredll.dll"
+#pragma dynimport runtime·Sleep Sleep "coredll.dll"
+#pragma dynimport runtime·SuspendThread SuspendThread "coredll.dll"
+#pragma dynimport runtime·timeBeginPeriod timeBeginPeriod "mmtimer.dll"
+#pragma dynimport runtime·WaitForSingleObject WaitForSingleObject "coredll.dll"
+#pragma dynimport runtime·WriteFile WriteFile "coredll.dll"
 
 extern void *runtime·CloseHandle;
 extern void *runtime·CreateEvent;
@@ -50,20 +40,19 @@ extern void *runtime·CryptAcquireContextW;
 extern void *runtime·CryptGenRandom;
 extern void *runtime·CryptReleaseContext;
 extern void *runtime·DuplicateHandle;
-extern void *runtime·ExitProcess;
+extern void *runtime·TerminateProcess;
 extern void *runtime·FreeEnvironmentStringsW;
 extern void *runtime·GetEnvironmentStringsW;
 extern void *runtime·GetProcAddress;
-extern void *runtime·GetStdioPathW;
+extern void *runtime·OpenStdConsole;
 extern void *runtime·GetSystemInfo;
 extern void *runtime·GetSystemTime;
 extern void *runtime·SystemTimeToFileTime;
 extern void *runtime·GetThreadContext;
 extern void *runtime·LoadLibrary;
-extern void *runtime·LoadLibraryA;
 extern void *runtime·ResumeThread;
 extern void *runtime·SetConsoleCtrlHandler;
-extern void *runtime·SetEvent;
+extern void *runtime·EventModify;
 extern void *runtime·SetThreadPriority;
 extern void *runtime·SetWaitableTimer;
 extern void *runtime·Sleep;
@@ -89,15 +78,18 @@ runtime·osinit(void)
 	void *kernel32;
 	void *SetProcessPriorityBoost;
 
+	// TODO(sebastian) Still correct for WinCE?
 	// -1 = current process, -2 = current thread
 	runtime·stdcall(runtime·DuplicateHandle, 7,
 		(uintptr)-1, (uintptr)-2, (uintptr)-1, &m->thread,
 		(uintptr)0, (uintptr)0, (uintptr)DUPLICATE_SAME_ACCESS);
+	// TODO(sebastian): Implement
 	//runtime·stdcall(runtime·SetConsoleCtrlHandler, 2, runtime·ctrlhandler, (uintptr)1);
 	runtime·stdcall(runtime·timeBeginPeriod, 1, (uintptr)1);
 	runtime·ncpu = getproccount();
 
-	kernel32 = runtime·stdcall(runtime·LoadLibraryA, 1, "kernel32.dll");
+	// TODO(sebastian): Not available on WinCE
+	kernel32 = runtime·stdcall(runtime·LoadLibrary, 1, "coredll.dll");
 	if(kernel32 != nil) {
 		// Windows dynamic priority boosting assumes that a process has different types
 		// of dedicated threads -- GUI, IO, computational, etc. Go processes use
@@ -160,34 +152,34 @@ runtime·goenvs(void)
 	*/
 }
 
+#define	SYS_HANDLE_BASE	64
+#define SH_CURPROC		2
+
 void
 runtime·exit(int32 code)
 {
-	runtime·stdcall(runtime·ExitProcess, 1, (uintptr)code);
+	// ExitProcess(exitcode) is essentially TerminateProcess(GetCurrentProcess(), exitcode) 
+	// and GetCurrentProcess() is effectively SH_CURPROC + SYS_HANDLE_BASE
+	runtime·stdcall(runtime·TerminateProcess, 2, (uintptr)(SH_CURPROC + SYS_HANDLE_BASE), (uintptr)code);
 }
 
 int32
 runtime·write(int32 fd, void *buf, int32 n)
 {
-	/*
 	void *handle;
+	uint32 dev;
 	uint32 written;
-
+	dev = 1;
 	written = 0;
-	switch(fd) {
-	case 1:
-		handle = runtime·stdcall(runtime·GetStdHandle, 1, (uintptr)-11);
-		break;
-	case 2:
-		handle = runtime·stdcall(runtime·GetStdHandle, 1, (uintptr)-12);
-		break;
-	default:
+	
+	// output and error only
+	if(fd != 1 && fd != 2)
 		return -1;
-	}
+	
+	handle = runtime·stdcall(runtime·OpenStdConsole, 2, (uintptr)fd, (uintptr)&dev);
 	runtime·stdcall(runtime·WriteFile, 5, handle, buf, (uintptr)n, &written, (uintptr)0);
+	// TODO(sebastian): CloseHandle(handle) needed?
 	return written;
-	*/
-	return -1;
 }
 
 #define INFINITE ((uintptr)0xFFFFFFFF)
@@ -212,7 +204,8 @@ runtime·semasleep(int64 ns)
 void
 runtime·semawakeup(M *mp)
 {
-	runtime·stdcall(runtime·SetEvent, 1, mp->waitsema);
+	// SetEvent(handle) is essentially ModifyEvent(handle, 3)
+	runtime·stdcall(runtime·EventModify, 2, mp->waitsema, (uintptr)3);
 }
 
 uintptr
