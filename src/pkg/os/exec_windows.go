@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"syscall"
 	"time"
-	"unsafe"
+	//"unsafe"
 )
 
 func (p *Process) wait() (ps *ProcessState, err error) {
@@ -91,11 +91,11 @@ func findProcess(pid int) (p *Process, err error) {
 }
 
 func init() {
-	var argc int32
-	cmd := syscall.GetCommandLine()
 	// NOTE(sebastian): Buggy? See first comment here: http://msdn.microsoft.com/en-us/library/windows/desktop/bb776391(v=vs.85).aspx
 	// TODO(sebastian): Implement yourself
 	/*
+	var argc int32
+	cmd := syscall.GetCommandLine()
 	argv, e := syscall.CommandLineToArgv(cmd, &argc)
 	if e != nil {
 		return

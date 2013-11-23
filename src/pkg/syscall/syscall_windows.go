@@ -436,8 +436,8 @@ func ComputerName() (name string, err error) {
  
     RegCloseKey(hKey);
     return wstring(Buffer);
-	return "", EWINDOWS
 	*/
+	return "", EWINDOWS
 }
 
 func Ftruncate(fd Handle, length int64) (err error) {
