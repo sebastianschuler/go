@@ -635,18 +635,18 @@ asmbpe(void)
 	set(ImageBase, PEBASE);
 	set(SectionAlignment, PESECTALIGN);
 	set(FileAlignment, PEFILEALIGN);
-	set(MajorOperatingSystemVersion, 4);
+	set(MajorOperatingSystemVersion, 8);
 	set(MinorOperatingSystemVersion, 0);
 	set(MajorImageVersion, 1);
 	set(MinorImageVersion, 0);
-	set(MajorSubsystemVersion, 4);
+	set(MajorSubsystemVersion, 8);
 	set(MinorSubsystemVersion, 0);
 	set(SizeOfImage, nextsectoff);
 	set(SizeOfHeaders, PEFILEHEADR);
 	if(strcmp(headstring, "windowsgui") == 0)
 		set(Subsystem, IMAGE_SUBSYSTEM_WINDOWS_GUI);
 	else
-		set(Subsystem, IMAGE_SUBSYSTEM_WINDOWS_CUI);
+		set(Subsystem, 9);
 
 	// Disable stack growth as we don't want Windows to
 	// fiddle with the thread stack limits, which we set

@@ -86,7 +86,7 @@ typedef struct _IMAGE_EXPORT_DIRECTORY {
 	uint32 AddressOfNameOrdinals;
 } IMAGE_EXPORT_DIRECTORY;
 
-#define PEBASE		0x00400000
+#define PEBASE		0x00010000
 // SectionAlignment must be greater than or equal to FileAlignment.
 // The default is the page size for the architecture.
 #define PESECTALIGN	0x1000
