@@ -417,8 +417,27 @@ func ComputerName() (name string, err error) {
 		return "", e
 	}
 	return string(utf16.Decode(b[0:n])), nil
-	*/
+	
+	// Example using the registry
+	HANDLE hKey;
+    e := RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Ident", 0, NULL, &hKey);
+    if e != nil {
+        return "", EWINDOWS;
+	}
+	
+    DWORD dwLen = MAX_PATH;
+    wchar_t Buffer[MAX_PATH];
+    if(RegQueryValueEx(hKey, L"Name", NULL, NULL, (LPBYTE)Buffer, &dwLen) != ERROR_SUCCESS)
+    {
+        RegCloseKey(hKey);
+        return wstring();
+    }
+    Buffer[dwLen] = NULL;
+ 
+    RegCloseKey(hKey);
+    return wstring(Buffer);
 	return "", EWINDOWS
+	*/
 }
 
 func Ftruncate(fd Handle, length int64) (err error) {
