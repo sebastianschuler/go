@@ -10,7 +10,7 @@
 
 #pragma dynimport runtime·CreateIoCompletionPort CreateIoCompletionPort "kernel32.dll"
 //#pragma dynimport runtime·GetQueuedCompletionStatus GetQueuedCompletionStatus "kernel32.dll"
-#pragma dynimport runtime·WSAGetOverlappedResult WSAGetOverlappedResult "ws2_32.dll"
+#pragma dynimport runtime·WSAGetOverlappedResult WSAGetOverlappedResult "ws2.dll"
 
 extern void *runtime·CreateIoCompletionPort;
 extern void *runtime·GetQueuedCompletionStatus;
