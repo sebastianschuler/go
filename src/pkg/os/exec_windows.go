@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"syscall"
 	"time"
-	//"unsafe"
+	"unsafe"
 )
 
 func (p *Process) wait() (ps *ProcessState, err error) {
@@ -106,6 +106,8 @@ func init() {
 		Args[i] = string(syscall.UTF16ToString((*v)[:]))
 	}
 	*/
+	Args = make([]string, 1)
+	Args[0] = syscall.UTF16ToString((*[256]uint16)(unsafe.Pointer(syscall.GetCommandLine()))[:])
 }
 
 func ftToDuration(ft *syscall.Filetime) time.Duration {
