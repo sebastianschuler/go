@@ -15,7 +15,7 @@ import (
 )
 
 func sendCtrlBreak(t *testing.T, pid int) {
-	d, e := syscall.LoadDLL("kernel32.dll")
+	d, e := syscall.LoadDLL("coredll.dll")
 	if e != nil {
 		t.Fatalf("LoadDLL: %v\n", e)
 	}

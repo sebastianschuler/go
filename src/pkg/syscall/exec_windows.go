@@ -321,6 +321,8 @@ func StartProcess(argv0 string, argv []string, attr *ProcAttr) (pid int, handle 
 	}
 	si := new(StartupInfo)
 	si.Cb = uint32(unsafe.Sizeof(*si))
+	
+	/*
 	si.Flags = STARTF_USESTDHANDLES
 	if sys.HideWindow {
 		si.Flags |= STARTF_USESHOWWINDOW
@@ -329,7 +331,23 @@ func StartProcess(argv0 string, argv []string, attr *ProcAttr) (pid int, handle 
 	si.StdInput = fd[0]
 	si.StdOutput = fd[1]
 	si.StdErr = fd[2]
-
+	*/
+	
+	stdinPath, _ := GetStdioPath(0)
+	stdoutPath, _ := GetStdioPath(1)
+	stderrPath, _ := GetStdioPath(1)
+	
+	h := getStdHandle(1)
+	
+	Write(h, []byte(stdinPath))
+	Write(h, []byte(stdoutPath))
+	Write(h, []byte(stderrPath))
+	
+	SetStdioPath(0, "PD00:")
+	SetStdioPath(1, "PD01:")
+	SetStdioPath(2, "PD02:")
+	
+	
 	pi := new(ProcessInformation)
 
 	flags := sys.CreationFlags | CREATE_UNICODE_ENVIRONMENT
@@ -338,7 +356,11 @@ func StartProcess(argv0 string, argv []string, attr *ProcAttr) (pid int, handle 
 		return 0, 0, err
 	}
 	defer CloseHandle(Handle(pi.Thread))
-
+	
+	SetStdioPath(0, stdinPath)
+	SetStdioPath(1, stdoutPath)
+	SetStdioPath(2, stderrPath)
+	
 	return int(pi.ProcessId), uintptr(pi.Process), nil
 }
 

@@ -85,7 +85,7 @@ func Test64BitReturnStdCall(t *testing.T) {
 		Reserve           byte
 	}
 
-	d := GetDLL(t, "kernel32.dll")
+	d := GetDLL(t, "coredll.dll")
 
 	var m1, m2 uintptr
 	VerSetConditionMask := d.Proc("VerSetConditionMask")

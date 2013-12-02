@@ -53,6 +53,7 @@ func runExample(eg InternalExample) (ok bool) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
 	os.Stdout = w
 	outC := make(chan string)
 	go func() {
@@ -60,12 +61,15 @@ func runExample(eg InternalExample) (ok bool) {
 		_, err := io.Copy(buf, r)
 		r.Close()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "testing: copying pipe: %v\n", err)
-			os.Exit(1)
+			// TODO(sebastian): Ugly hack, currently throws error "read |0: invalid argument" but copy succeeded
+			if err.Error() != "read |0: invalid argument" {
+				fmt.Fprintf(os.Stderr, "testing: copying pipe: %v\n", err)
+				os.Exit(1)
+			}
 		}
 		outC <- buf.String()
 	}()
-
+	
 	start := time.Now()
 	ok = true
 

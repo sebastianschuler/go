@@ -8,7 +8,7 @@
 
 #define DWORD_MAX 0xffffffff
 
-#pragma dynimport runtime·CreateIoCompletionPort CreateIoCompletionPort "kernel32.dll"
+#pragma dynimport runtime·CreateIoCompletionPort CreateIoCompletionPort "coredll.dll"
 //#pragma dynimport runtime·GetQueuedCompletionStatus GetQueuedCompletionStatus "kernel32.dll"
 #pragma dynimport runtime·WSAGetOverlappedResult WSAGetOverlappedResult "ws2.dll"
 

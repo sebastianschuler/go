@@ -55,7 +55,7 @@ func abort(funcname string, err error) {
 }
 
 func ExampleLoadLibrary() {
-	h, err := syscall.LoadLibrary("kernel32.dll")
+	h, err := syscall.LoadLibrary("coredll.dll")
 	if err != nil {
 		abort("LoadLibrary", err)
 	}

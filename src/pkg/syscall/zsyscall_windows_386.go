@@ -7,6 +7,7 @@ import "unsafe"
 
 var (
 	modcoredll = NewLazyDLL("coredll.dll")
+	modpipedev = NewLazyDLL("pipedev.dll")
 	modcrypt32 = NewLazyDLL("crypt32.dll")
 	modws2_32 = NewLazyDLL("ws2_32.dll")
 	modmswsock = NewLazyDLL("mswsock.dll")
@@ -47,6 +48,7 @@ var (
 	procDuplicateHandle = modcoredll.NewProc("DuplicateHandle")
 	procWaitForSingleObject = modcoredll.NewProc("WaitForSingleObject")
 	procGetTempPathW = modcoredll.NewProc("GetTempPathW")
+	procCreatePipe = modpipedev.NewProc("CreatePipe")
 	procCryptAcquireContextW = modcoredll.NewProc("CryptAcquireContextW")
 	procCryptReleaseContext = modcoredll.NewProc("CryptReleaseContext")
 	procCryptGenRandom = modcoredll.NewProc("CryptGenRandom")
@@ -76,6 +78,8 @@ var (
 	procRegEnumKeyExW = modcoredll.NewProc("RegEnumKeyExW")
 	procRegQueryValueExW = modcoredll.NewProc("RegQueryValueExW")
 	proc__GetUserKData = modcoredll.NewProc("__GetUserKData")
+	procGetStdioPathW = modcoredll.NewProc("GetStdioPathW")
+	procSetStdioPathW = modcoredll.NewProc("SetStdioPathW")
 	procWSAStartup = modws2_32.NewProc("WSAStartup")
 	procWSACleanup = modws2_32.NewProc("WSACleanup")
 	procWSAIoctl = modws2_32.NewProc("WSAIoctl")
@@ -517,6 +521,18 @@ func GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) {
 	return
 }
 
+func CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error) {
+	r1, _, e1 := Syscall6(procCreatePipe.Addr(), 4, uintptr(unsafe.Pointer(readhandle)), uintptr(unsafe.Pointer(writehandle)), uintptr(unsafe.Pointer(sa)), uintptr(size), 0, 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = EINVAL
+		}
+	}
+	return
+}
+
 func CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) {
 	r1, _, e1 := Syscall6(procCryptAcquireContextW.Addr(), 5, uintptr(unsafe.Pointer(provhandle)), uintptr(unsafe.Pointer(container)), uintptr(unsafe.Pointer(provider)), uintptr(provtype), uintptr(flags), 0)
 	if r1 == 0 {
@@ -831,6 +847,30 @@ func RegQueryValueEx(key Handle, name *uint16, reserved *uint32, valtype *uint32
 func GetUserKData(offset uint32) (kdata uint32) {
 	r0, _, _ := Syscall(proc__GetUserKData.Addr(), 1, uintptr(offset), 0, 0)
 	kdata = uint32(r0)
+	return
+}
+
+func GetStdioPath1(stdhandle int, buf *uint16, n *uint32) (err error) {
+	r1, _, e1 := Syscall(procGetStdioPathW.Addr(), 3, uintptr(stdhandle), uintptr(unsafe.Pointer(buf)), uintptr(unsafe.Pointer(n)))
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = EINVAL
+		}
+	}
+	return
+}
+
+func SetStdioPath1(stdhandle int, buf *uint16) (err error) {
+	r1, _, e1 := Syscall(procSetStdioPathW.Addr(), 2, uintptr(stdhandle), uintptr(unsafe.Pointer(buf)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = EINVAL
+		}
+	}
 	return
 }
 

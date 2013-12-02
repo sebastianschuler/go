@@ -152,7 +152,7 @@ func NewCallback(fn interface{}) uintptr
 //sys	DuplicateHandle(hSourceProcessHandle Handle, hSourceHandle Handle, hTargetProcessHandle Handle, lpTargetHandle *Handle, dwDesiredAccess uint32, bInheritHandle bool, dwOptions uint32) (err error)
 //sys	WaitForSingleObject(handle Handle, waitMilliseconds uint32) (event uint32, err error) [failretval==0xffffffff]
 //sys	GetTempPath(buflen uint32, buf *uint16) (n uint32, err error) = GetTempPathW
-///sys	CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error)
+//sys	CreatePipe(readhandle *Handle, writehandle *Handle, sa *SecurityAttributes, size uint32) (err error) = pipedev.CreatePipe
 ///sys	GetFileType(filehandle Handle) (n uint32, err error)
 //sys	CryptAcquireContext(provhandle *Handle, container *uint16, provider *uint16, provtype uint32, flags uint32) (err error) = CryptAcquireContextW
 //sys	CryptReleaseContext(provhandle Handle, flags uint32) (err error) = CryptReleaseContext
@@ -199,6 +199,9 @@ func NewCallback(fn interface{}) uintptr
 ///sys	GetConsoleMode(console Handle, mode *uint32) (err error) = GetConsoleMode
 ///sys	WriteConsole(console Handle, buf *uint16, towrite uint32, written *uint32, reserved *byte) (err error) = WriteConsoleW
 ///sys	ReadConsole(console Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) (err error) = ReadConsoleW
+
+//sys	GetStdioPath1(stdhandle int, buf *uint16, n *uint32) (err error) = GetStdioPathW
+//sys	SetStdioPath1(stdhandle int, buf *uint16) (err error) = SetStdioPathW
 
 // syscall interface implementation for other packages
 
@@ -344,6 +347,25 @@ func getStdHandle(h int) (fd Handle) {
 	return r
 }
 
+func GetStdioPath(h int) (path string, err error) {
+	// TODO(sebastian): Add correct max path len
+	var n uint32 = 255 + 1
+	b := make([]uint16, n)
+	e := GetStdioPath1(h, &b[0], &n)
+	if e != nil {
+		return "", e
+	}
+	return string(utf16.Decode(b[0:n])), nil 
+}
+
+func SetStdioPath(h int, path string) (err error) {
+	pathp, err := UTF16PtrFromString(path)
+	if err != nil {
+		return err
+	}
+	return SetStdioPath1(h, pathp)
+}
+
 const ImplementsGetwd = true
 
 func Getwd() (wd string, err error) {
@@ -468,20 +490,17 @@ func Gettimeofday(tv *Timeval) (err error) {
 
 func Pipe(p []Handle) (err error) {
 	// TODO(sebastian): Implement
-	/*
 	if len(p) != 2 {
 		return EINVAL
 	}
 	var r, w Handle
-	e := CreatePipe(&r, &w, makeInheritSa(), 0)
+	e := CreatePipe(&r, &w, nil, 0)
 	if e != nil {
 		return e
 	}
 	p[0] = r
 	p[1] = w
 	return nil
-	*/
-	return EWINDOWS
 }
 
 func Utimes(path string, tv []Timeval) (err error) {

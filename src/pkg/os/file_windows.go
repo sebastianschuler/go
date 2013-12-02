@@ -470,6 +470,7 @@ func Pipe() (r *File, w *File, err error) {
 		syscall.ForkLock.RUnlock()
 		return nil, nil, NewSyscallError("pipe", e)
 	}
+
 	syscall.CloseOnExec(p[0])
 	syscall.CloseOnExec(p[1])
 	syscall.ForkLock.RUnlock()
