@@ -80,6 +80,7 @@ var (
 	proc__GetUserKData = modcoredll.NewProc("__GetUserKData")
 	procGetStdioPathW = modcoredll.NewProc("GetStdioPathW")
 	procSetStdioPathW = modcoredll.NewProc("SetStdioPathW")
+	procGetModuleFileNameW = modcoredll.NewProc("GetModuleFileNameW")
 	procWSAStartup = modws2_32.NewProc("WSAStartup")
 	procWSACleanup = modws2_32.NewProc("WSACleanup")
 	procWSAIoctl = modws2_32.NewProc("WSAIoctl")
@@ -606,7 +607,7 @@ func SetFileAttributes(name *uint16, attrs uint32) (err error) {
 	return
 }
 
-func GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) {
+func GetFileAttributesEx1(name *uint16, level uint32, info *byte) (err error) {
 	r1, _, e1 := Syscall(procGetFileAttributesExW.Addr(), 3, uintptr(unsafe.Pointer(name)), uintptr(level), uintptr(unsafe.Pointer(info)))
 	if r1 == 0 {
 		if e1 != 0 {
@@ -865,6 +866,19 @@ func GetStdioPath1(stdhandle int, buf *uint16, n *uint32) (err error) {
 func SetStdioPath1(stdhandle int, buf *uint16) (err error) {
 	r1, _, e1 := Syscall(procSetStdioPathW.Addr(), 2, uintptr(stdhandle), uintptr(unsafe.Pointer(buf)), 0)
 	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = EINVAL
+		}
+	}
+	return
+}
+
+func GetModuleFileName(modulehandle int, path *uint16, buflen uint32) (n uint32, err error) {
+	r0, _, e1 := Syscall(procGetModuleFileNameW.Addr(), 3, uintptr(modulehandle), uintptr(unsafe.Pointer(path)), uintptr(buflen))
+	n = uint32(r0)
+	if n == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {

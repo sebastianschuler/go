@@ -8,7 +8,9 @@ package syscall
 
 import (
 	errorspkg "errors"
+	"strings"
 	"sync"
+	"unicode/utf8"
 	"unicode/utf16"
 	"unsafe"
 )
@@ -164,7 +166,7 @@ func NewCallback(fn interface{}) uintptr
 //sys	SetFileTime(handle Handle, ctime *Filetime, atime *Filetime, wtime *Filetime) (err error)
 //sys	GetFileAttributes(name *uint16) (attrs uint32, err error) [failretval==INVALID_FILE_ATTRIBUTES] = GetFileAttributesW
 //sys	SetFileAttributes(name *uint16, attrs uint32) (err error) = SetFileAttributesW
-//sys	GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) = GetFileAttributesExW
+//sys	GetFileAttributesEx1(name *uint16, level uint32, info *byte) (err error) = GetFileAttributesExW
 //sys	GetCommandLine() (cmd *uint16) = GetCommandLineW
 //sys	LocalFree(hmem Handle) (handle Handle, err error) [failretval!=0]
 ///sys	SetHandleInformation(handle Handle, mask uint32, flags uint32) (err error)
@@ -202,6 +204,7 @@ func NewCallback(fn interface{}) uintptr
 
 //sys	GetStdioPath1(stdhandle int, buf *uint16, n *uint32) (err error) = GetStdioPathW
 //sys	SetStdioPath1(stdhandle int, buf *uint16) (err error) = SetStdioPathW
+//sys	GetModuleFileName(modulehandle int, path *uint16, buflen uint32) (n uint32, err error) = GetModuleFileNameW
 
 // syscall interface implementation for other packages
 
@@ -218,6 +221,17 @@ func makeInheritSa() *SecurityAttributes {
 	return &sa
 }
 
+// TODO(sebastian): Needs proper implementation
+func abs(path *uint16) (*uint16, error) {
+	wd, err := Getwd()
+	if err != nil {
+		return path, err
+	}
+	wd += "\\" + UTF16ToString((*[300]uint16)(unsafe.Pointer(path))[:])
+	wd = strings.Replace(wd, "/", "\\", -1)
+	return UTF16PtrFromString(wd)
+}
+
 func Open(path string, mode int, perm uint32) (fd Handle, err error) {
 	if len(path) == 0 {
 		return InvalidHandle, ERROR_FILE_NOT_FOUND
@@ -226,6 +240,12 @@ func Open(path string, mode int, perm uint32) (fd Handle, err error) {
 	if err != nil {
 		return InvalidHandle, err
 	}
+	
+	pathp, err = abs(pathp)
+	if err != nil {
+		return InvalidHandle, err
+	}
+	
 	var access uint32
 	switch mode & (O_RDONLY | O_WRONLY | O_RDWR) {
 	case O_RDONLY:
@@ -331,6 +351,14 @@ func Close(fd Handle) (err error) {
 	return CloseHandle(fd)
 }
 
+func GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) {
+	name, err = abs(name)
+	if err != nil {
+		return err
+	}
+	return GetFileAttributesEx1(name, level, info)
+}
+
 var (
 	Stdin  = getStdHandle(STD_INPUT_HANDLE)
 	Stdout = getStdHandle(STD_OUTPUT_HANDLE)
@@ -348,8 +376,7 @@ func getStdHandle(h int) (fd Handle) {
 }
 
 func GetStdioPath(h int) (path string, err error) {
-	// TODO(sebastian): Add correct max path len
-	var n uint32 = 255 + 1
+	var n uint32 = 300
 	b := make([]uint16, n)
 	e := GetStdioPath1(h, &b[0], &n)
 	if e != nil {
@@ -367,34 +394,34 @@ func SetStdioPath(h int, path string) (err error) {
 }
 
 const ImplementsGetwd = true
+var workingDir string;
 
-func Getwd() (wd string, err error) {
-	// TODO(sebastian): Implement
-	/*
-	b := make([]uint16, 300)
-	n, e := GetCurrentDirectory(uint32(len(b)), &b[0])
-	if e != nil {
-		return "", e
+func Getwd() (string, error) {
+	if utf8.RuneCountInString(workingDir) <= 0 {
+		b := make([]uint16, 300)
+		n, e := GetModuleFileName(0, &b[0], uint32(len(b)))
+		if e != nil {
+			return "", e
+		}
+		workingDir = string(utf16.Decode(b[0:n]))
+		i := strings.LastIndex(workingDir, "\\")
+		workingDir = workingDir[:i]
 	}
-	return string(utf16.Decode(b[0:n])), nil
-	*/
-	return "", EWINDOWS
+	return workingDir, nil
 }
 
 func Chdir(path string) (err error) {
-	// TODO(sebastian): Implement
-	/*
-	pathp, err := UTF16PtrFromString(path)
-	if err != nil {
-		return err
-	}
-	return SetCurrentDirectory(pathp)
-	*/
-	return EWINDOWS
+	// TODO(sebastian): Check for abs
+	workingDir = path
+	return nil
 }
 
 func Mkdir(path string, mode uint32) (err error) {
 	pathp, err := UTF16PtrFromString(path)
+	if err != nil {
+		return err
+	}
+	pathp, err = abs(pathp)
 	if err != nil {
 		return err
 	}
@@ -406,11 +433,19 @@ func Rmdir(path string) (err error) {
 	if err != nil {
 		return err
 	}
+	pathp, err = abs(pathp)
+	if err != nil {
+		return err
+	}
 	return RemoveDirectory(pathp)
 }
 
 func Unlink(path string) (err error) {
 	pathp, err := UTF16PtrFromString(path)
+	if err != nil {
+		return err
+	}
+	pathp, err = abs(pathp)
 	if err != nil {
 		return err
 	}
@@ -422,7 +457,15 @@ func Rename(oldpath, newpath string) (err error) {
 	if err != nil {
 		return err
 	}
+	from, err = abs(from)
+	if err != nil {
+		return err
+	}
 	to, err := UTF16PtrFromString(newpath)
+	if err != nil {
+		return err
+	}
+	to, err = abs(to)
 	if err != nil {
 		return err
 	}
@@ -489,7 +532,6 @@ func Gettimeofday(tv *Timeval) (err error) {
 }
 
 func Pipe(p []Handle) (err error) {
-	// TODO(sebastian): Implement
 	if len(p) != 2 {
 		return EINVAL
 	}
@@ -554,6 +596,10 @@ func Chmod(path string, mode uint32) (err error) {
 	p, e := UTF16PtrFromString(path)
 	if e != nil {
 		return e
+	}
+	p, err = abs(p)
+	if err != nil {
+		return err
 	}
 	attrs, e := GetFileAttributes(p)
 	if e != nil {
@@ -949,6 +995,10 @@ func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) {
 func Getpid() (pid int) { return int(GetUserKData(12)) }
 
 func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) {
+	name, err = abs(name)
+	if err != nil {
+		return InvalidHandle, err
+	}
 	// NOTE(rsc): The Win32finddata struct is wrong for the system call:
 	// the two paths are each one uint16 short. Use the correct struct,
 	// a win32finddata1, and then copy the results out.
