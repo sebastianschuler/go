@@ -633,37 +633,37 @@ func LoadSetFileCompletionNotificationModes() error {
 
 const socket_error = uintptr(^uint32(0))
 
-//sys	WSAStartup(verreq uint32, data *WSAData) (sockerr error) = ws2_32.WSAStartup
-//sys	WSACleanup() (err error) [failretval==socket_error] = ws2_32.WSACleanup
-//sys	WSAIoctl(s Handle, iocc uint32, inbuf *byte, cbif uint32, outbuf *byte, cbob uint32, cbbr *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) [failretval==socket_error] = ws2_32.WSAIoctl
-//sys	socket(af int32, typ int32, protocol int32) (handle Handle, err error) [failretval==InvalidHandle] = ws2_32.socket
-//sys	Setsockopt(s Handle, level int32, optname int32, optval *byte, optlen int32) (err error) [failretval==socket_error] = ws2_32.setsockopt
-//sys	Getsockopt(s Handle, level int32, optname int32, optval *byte, optlen *int32) (err error) [failretval==socket_error] = ws2_32.getsockopt
-//sys	bind(s Handle, name uintptr, namelen int32) (err error) [failretval==socket_error] = ws2_32.bind
-//sys	connect(s Handle, name uintptr, namelen int32) (err error) [failretval==socket_error] = ws2_32.connect
-//sys	getsockname(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) [failretval==socket_error] = ws2_32.getsockname
-//sys	getpeername(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) [failretval==socket_error] = ws2_32.getpeername
-//sys	listen(s Handle, backlog int32) (err error) [failretval==socket_error] = ws2_32.listen
-//sys	shutdown(s Handle, how int32) (err error) [failretval==socket_error] = ws2_32.shutdown
-//sys	Closesocket(s Handle) (err error) [failretval==socket_error] = ws2_32.closesocket
+//sys	WSAStartup(verreq uint32, data *WSAData) (sockerr error) = ws2.WSAStartup
+//sys	WSACleanup() (err error) [failretval==socket_error] = ws2.WSACleanup
+//sys	WSAIoctl(s Handle, iocc uint32, inbuf *byte, cbif uint32, outbuf *byte, cbob uint32, cbbr *uint32, overlapped *Overlapped, completionRoutine uintptr) (err error) [failretval==socket_error] = ws2.WSAIoctl
+//sys	socket(af int32, typ int32, protocol int32) (handle Handle, err error) [failretval==InvalidHandle] = ws2.socket
+//sys	Setsockopt(s Handle, level int32, optname int32, optval *byte, optlen int32) (err error) [failretval==socket_error] = ws2.setsockopt
+//sys	Getsockopt(s Handle, level int32, optname int32, optval *byte, optlen *int32) (err error) [failretval==socket_error] = ws2.getsockopt
+//sys	bind(s Handle, name uintptr, namelen int32) (err error) [failretval==socket_error] = ws2.bind
+//sys	connect(s Handle, name uintptr, namelen int32) (err error) [failretval==socket_error] = ws2.connect
+//sys	getsockname(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) [failretval==socket_error] = ws2.getsockname
+//sys	getpeername(s Handle, rsa *RawSockaddrAny, addrlen *int32) (err error) [failretval==socket_error] = ws2.getpeername
+//sys	listen(s Handle, backlog int32) (err error) [failretval==socket_error] = ws2.listen
+//sys	shutdown(s Handle, how int32) (err error) [failretval==socket_error] = ws2.shutdown
+//sys	Closesocket(s Handle) (err error) [failretval==socket_error] = ws2.closesocket
 //sys	AcceptEx(ls Handle, as Handle, buf *byte, rxdatalen uint32, laddrlen uint32, raddrlen uint32, recvd *uint32, overlapped *Overlapped) (err error) = mswsock.AcceptEx
 //sys	GetAcceptExSockaddrs(buf *byte, rxdatalen uint32, laddrlen uint32, raddrlen uint32, lrsa **RawSockaddrAny, lrsalen *int32, rrsa **RawSockaddrAny, rrsalen *int32) = mswsock.GetAcceptExSockaddrs
-//sys	WSARecv(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *uint32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2_32.WSARecv
-//sys	WSASend(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2_32.WSASend
-//sys	WSARecvFrom(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *uint32,  from *RawSockaddrAny, fromlen *int32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2_32.WSARecvFrom
-//sys	WSASendTo(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, to *RawSockaddrAny, tolen int32,  overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2_32.WSASendTo
-//sys	GetHostByName(name string) (h *Hostent, err error) [failretval==nil] = ws2_32.gethostbyname
-//sys	GetServByName(name string, proto string) (s *Servent, err error) [failretval==nil] = ws2_32.getservbyname
-//sys	Ntohs(netshort uint16) (u uint16) = ws2_32.ntohs
-//sys	GetProtoByName(name string) (p *Protoent, err error) [failretval==nil] = ws2_32.getprotobyname
-//sys	DnsQuery(name string, qtype uint16, options uint32, extra *byte, qrs **DNSRecord, pr *byte) (status error) = dnsapi.DnsQuery_W
-//sys	DnsRecordListFree(rl *DNSRecord, freetype uint32) = dnsapi.DnsRecordListFree
-//sys	GetAddrInfoW(nodename *uint16, servicename *uint16, hints *AddrinfoW, result **AddrinfoW) (sockerr error) = ws2_32.GetAddrInfoW
-//sys	FreeAddrInfoW(addrinfo *AddrinfoW) = ws2_32.FreeAddrInfoW
+//sys	WSARecv(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *uint32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2.WSARecv
+//sys	WSASend(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2.WSASend
+//sys	WSARecvFrom(s Handle, bufs *WSABuf, bufcnt uint32, recvd *uint32, flags *uint32,  from *RawSockaddrAny, fromlen *int32, overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2.WSARecvFrom
+//sys	WSASendTo(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, to *RawSockaddrAny, tolen int32,  overlapped *Overlapped, croutine *byte) (err error) [failretval==socket_error] = ws2.WSASendTo
+//sys	GetHostByName(name string) (h *Hostent, err error) [failretval==nil] = ws2.gethostbyname
+//sys	GetServByName(name string, proto string) (s *Servent, err error) [failretval==nil] = ws2.getservbyname
+//sys	Ntohs(netshort uint16) (u uint16) = ws2.ntohs
+//sys	GetProtoByName(name string) (p *Protoent, err error) [failretval==nil] = ws2.getprotobyname
+//sys	DnsQuery(name string, qtype uint16, options uint32, extra *byte, qrs **DNSRecord, pr *byte) (status error) = coredll.AFPDnsQuery_W
+//sys	DnsRecordListFree(rl *DNSRecord, freetype uint32) = coredll.AfdDNSRecordListFree
+//sys	GetAddrInfoW(nodename *uint16, servicename *uint16, hints *AddrinfoW, result **AddrinfoW) (sockerr error) = ws2.GetAddrInfoW
+//sys	FreeAddrInfoW(addrinfo *AddrinfoW) = ws2.FreeAddrInfoW
 //sys	GetIfEntry(pIfRow *MibIfRow) (errcode error) = iphlpapi.GetIfEntry
 //sys	GetAdaptersInfo(ai *IpAdapterInfo, ol *uint32) (errcode error) = iphlpapi.GetAdaptersInfo
 //sys	SetFileCompletionNotificationModes(handle Handle, flags uint8) (err error) = coredll.SetFileCompletionNotificationModes
-//sys	WSAEnumProtocols(protocols *int32, protocolBuffer *WSAProtocolInfo, bufferLength *uint32) (n int32, err error) [failretval==-1] = ws2_32.WSAEnumProtocolsW
+//sys	WSAEnumProtocols(protocols *int32, protocolBuffer *WSAProtocolInfo, bufferLength *uint32) (n int32, err error) [failretval==-1] = ws2.WSAEnumProtocolsW
 
 // For testing: clients can set this flag to force
 // creation of IPv6 sockets to return EAFNOSUPPORT.
