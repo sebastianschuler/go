@@ -91,23 +91,14 @@ func findProcess(pid int) (p *Process, err error) {
 }
 
 func init() {
-	// NOTE(sebastian): Buggy? See first comment here: http://msdn.microsoft.com/en-us/library/windows/desktop/bb776391(v=vs.85).aspx
-	// TODO(sebastian): Implement yourself
-	/*
-	var argc int32
-	cmd := syscall.GetCommandLine()
-	argv, e := syscall.CommandLineToArgv(cmd, &argc)
-	if e != nil {
-		return
+	cmd := syscall.UTF16ToString((*[300]uint16)(unsafe.Pointer(syscall.GetCommandLine()))[:])
+	var err error
+	Args, err = CommandLineToArgv(cmd)
+	if err != nil {
+		// Should never fail
+		syscall.Write(syscall.Stderr, []byte("invalid command line: "))
+		syscall.Write(syscall.Stderr, []byte(cmd))
 	}
-	defer syscall.LocalFree(syscall.Handle(uintptr(unsafe.Pointer(argv))))
-	Args = make([]string, argc)
-	for i, v := range (*argv)[:argc] {
-		Args[i] = string(syscall.UTF16ToString((*v)[:]))
-	}
-	*/
-	Args = make([]string, 1)
-	Args[0] = syscall.UTF16ToString((*[256]uint16)(unsafe.Pointer(syscall.GetCommandLine()))[:])
 }
 
 func ftToDuration(ft *syscall.Filetime) time.Duration {
