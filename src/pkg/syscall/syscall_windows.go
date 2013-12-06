@@ -221,7 +221,7 @@ func makeInheritSa() *SecurityAttributes {
 	return &sa
 }
 
-// TODO(sebastian): Needs proper implementation
+/* TODO(sebastian): Needs proper implementation
 func abs(path *uint16) (*uint16, error) {
 	wd, err := Getwd()
 	if err != nil {
@@ -231,21 +231,34 @@ func abs(path *uint16) (*uint16, error) {
 	wd = strings.Replace(wd, "/", "\\", -1)
 	return UTF16PtrFromString(wd)
 }
+*/
+
+func abs(path string) (string, error) {
+	r, _ := utf8.DecodeRuneInString(path)
+	if r == '\\' { //"\u2044" // Check if we already have an absolute path
+		return path, nil
+	}
+	wd, err := Getwd()
+	if err != nil {
+		return path, err
+	}
+	wd += "\\" + path
+	return strings.Replace(wd, "/", "\\", -1), nil
+}
+
 
 func Open(path string, mode int, perm uint32) (fd Handle, err error) {
 	if len(path) == 0 {
 		return InvalidHandle, ERROR_FILE_NOT_FOUND
 	}
+	path, err = abs(path)
+	if err != nil {
+		return InvalidHandle, err
+	}
 	pathp, err := UTF16PtrFromString(path)
 	if err != nil {
 		return InvalidHandle, err
 	}
-	
-	pathp, err = abs(pathp)
-	if err != nil {
-		return InvalidHandle, err
-	}
-	
 	var access uint32
 	switch mode & (O_RDONLY | O_WRONLY | O_RDWR) {
 	case O_RDONLY:
@@ -352,7 +365,11 @@ func Close(fd Handle) (err error) {
 }
 
 func GetFileAttributesEx(name *uint16, level uint32, info *byte) (err error) {
-	name, err = abs(name)
+	namep, err := abs(UTF16ToString((*[300]uint16)(unsafe.Pointer(name))[:]))
+	if err != nil {
+		return err
+	}
+	name, err = UTF16PtrFromString(namep)
 	if err != nil {
 		return err
 	}
@@ -417,11 +434,11 @@ func Chdir(path string) (err error) {
 }
 
 func Mkdir(path string, mode uint32) (err error) {
-	pathp, err := UTF16PtrFromString(path)
+	path, err = abs(path)
 	if err != nil {
 		return err
 	}
-	pathp, err = abs(pathp)
+	pathp, err := UTF16PtrFromString(path)
 	if err != nil {
 		return err
 	}
@@ -429,11 +446,11 @@ func Mkdir(path string, mode uint32) (err error) {
 }
 
 func Rmdir(path string) (err error) {
-	pathp, err := UTF16PtrFromString(path)
+	path, err = abs(path)
 	if err != nil {
 		return err
 	}
-	pathp, err = abs(pathp)
+	pathp, err := UTF16PtrFromString(path)
 	if err != nil {
 		return err
 	}
@@ -441,11 +458,11 @@ func Rmdir(path string) (err error) {
 }
 
 func Unlink(path string) (err error) {
-	pathp, err := UTF16PtrFromString(path)
+	path, err = abs(path)
 	if err != nil {
 		return err
 	}
-	pathp, err = abs(pathp)
+	pathp, err := UTF16PtrFromString(path)
 	if err != nil {
 		return err
 	}
@@ -453,19 +470,19 @@ func Unlink(path string) (err error) {
 }
 
 func Rename(oldpath, newpath string) (err error) {
+	oldpath, err = abs(oldpath)
+	if err != nil {
+		return err
+	}
+	newpath, err = abs(newpath)
+	if err != nil {
+		return err
+	}
 	from, err := UTF16PtrFromString(oldpath)
 	if err != nil {
 		return err
 	}
-	from, err = abs(from)
-	if err != nil {
-		return err
-	}
 	to, err := UTF16PtrFromString(newpath)
-	if err != nil {
-		return err
-	}
-	to, err = abs(to)
 	if err != nil {
 		return err
 	}
@@ -546,6 +563,7 @@ func Pipe(p []Handle) (err error) {
 }
 
 func Utimes(path string, tv []Timeval) (err error) {
+	// TODO(sebastian): Needs abs path too?
 	if len(tv) != 2 {
 		return EINVAL
 	}
@@ -566,6 +584,7 @@ func Utimes(path string, tv []Timeval) (err error) {
 }
 
 func UtimesNano(path string, ts []Timespec) (err error) {
+	// TODO(sebastian): Needs abs path too?
 	if len(ts) != 2 {
 		return EINVAL
 	}
@@ -593,13 +612,13 @@ func Chmod(path string, mode uint32) (err error) {
 	if mode == 0 {
 		return EINVAL
 	}
+	path, err = abs(path)
+	if err != nil {
+		return err
+	}
 	p, e := UTF16PtrFromString(path)
 	if e != nil {
 		return e
-	}
-	p, err = abs(p)
-	if err != nil {
-		return err
 	}
 	attrs, e := GetFileAttributes(p)
 	if e != nil {
@@ -995,7 +1014,11 @@ func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) {
 func Getpid() (pid int) { return int(GetUserKData(12)) }
 
 func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) {
-	name, err = abs(name)
+	namep, err := abs(UTF16ToString((*[300]uint16)(unsafe.Pointer(name))[:]))
+	if err != nil {
+		return InvalidHandle, err
+	}
+	name, err = UTF16PtrFromString(namep)
 	if err != nil {
 		return InvalidHandle, err
 	}
