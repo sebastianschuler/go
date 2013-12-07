@@ -113,6 +113,115 @@ func (e Errno) Timeout() bool {
 // Implemented in ../runtime/syscall_windows.goc
 func NewCallback(fn interface{}) uintptr
 
+// Copied from path/path.go!
+type lazybuf struct {
+	s   string
+	buf []byte
+	w   int
+}
+
+func (b *lazybuf) index(i int) byte {
+	if b.buf != nil {
+		return b.buf[i]
+	}
+	return b.s[i]
+}
+
+func (b *lazybuf) append(c byte) {
+	if b.buf == nil {
+		if b.w < len(b.s) && b.s[b.w] == c {
+			b.w++
+			return
+		}
+		b.buf = make([]byte, len(b.s))
+		copy(b.buf, b.s[:b.w])
+	}
+	b.buf[b.w] = c
+	b.w++
+}
+
+func (b *lazybuf) string() string {
+	if b.buf == nil {
+		return b.s[:b.w]
+	}
+	return string(b.buf[:b.w])
+}
+
+func clean(path string) string {
+	if path == "" {
+		return "."
+	}
+	rooted := path[0] == '\\'
+	n := len(path)
+	// Invariants:
+	//	reading from path; r is index of next byte to process.
+	//	writing to buf; w is index of next byte to write.
+	//	dotdot is index in buf where .. must stop, either because
+	//		it is the leading slash or it is a leading ../../.. prefix.
+	out := lazybuf{s: path}
+	r, dotdot := 0, 0
+	if rooted {
+		out.append('\\')
+		r, dotdot = 1, 1
+	}
+	for r < n {
+		switch {
+		case path[r] == '\\':
+			// empty path element
+			r++
+		case path[r] == '.' && (r+1 == n || path[r+1] == '\\'):
+			// . element
+			r++
+		case path[r] == '.' && path[r+1] == '.' && (r+2 == n || path[r+2] == '\\'):
+			// .. element: remove to last \
+			r += 2
+			switch {
+			case out.w > dotdot:
+				// can backtrack
+				out.w--
+				for out.w > dotdot && out.index(out.w) != '\\' {
+					out.w--
+				}
+			case !rooted:
+				// cannot backtrack, but not rooted, so append .. element.
+				if out.w > 0 {
+					out.append('\\')
+				}
+				out.append('.')
+				out.append('.')
+				dotdot = out.w
+			}
+		default:
+			// real path element.
+			// add slash if needed
+			if rooted && out.w != 1 || !rooted && out.w != 0 {
+				out.append('\\')
+			}
+			// copy element
+			for ; r < n && path[r] != '\\'; r++ {
+				out.append(path[r])
+			}
+		}
+	}
+	// Turn empty string into "."
+	if out.w == 0 {
+		return "."
+	}
+	return strings.Replace(out.string(), "/", "\\", -1)
+}
+
+func abs(path string) (string, error) {
+	if len(path) > 0 && path[0] == '\\' {
+		return clean(path), nil
+	}
+	wd, err := Getwd()
+	if err != nil {
+		return "", err
+	}
+	return clean(wd + "\\" + path), nil
+}
+
+
 // windows api calls
 
 //sys	GetLastError() (lasterr error)
@@ -127,8 +236,8 @@ func NewCallback(fn interface{}) uintptr
 //sys	SetFilePointer(handle Handle, lowoffset int32, highoffsetptr *int32, whence uint32) (newlowoffset uint32, err error) [failretval==0xffffffff]
 //sys	CloseHandle(handle Handle) (err error)
 //sys	OpenStdConsole(stdhandle int, dev *uint32) (handle Handle, err error)
-//sys	findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstFileW
-//sys	findNextFile1(handle Handle, data *win32finddata1) (err error) = FindNextFileW
+//sys	findFirstFile1(name *uint16, data *WinCEfinddata) (handle Handle, err error) [failretval==InvalidHandle] = FindFirstFileW
+//sys	findNextFile1(handle Handle, data *WinCEfinddata) (err error) = FindNextFileW
 //sys	FindClose(handle Handle) (err error)
 //sys	GetFileInformationByHandle(handle Handle, data *ByHandleFileInformation) (err error)
 ///sys	GetCurrentDirectory(buflen uint32, buf *uint16) (n uint32, err error) = GetCurrentDirectoryW
@@ -220,32 +329,6 @@ func makeInheritSa() *SecurityAttributes {
 	sa.InheritHandle = 1
 	return &sa
 }
-
-/* TODO(sebastian): Needs proper implementation
-func abs(path *uint16) (*uint16, error) {
-	wd, err := Getwd()
-	if err != nil {
-		return path, err
-	}
-	wd += "\\" + UTF16ToString((*[300]uint16)(unsafe.Pointer(path))[:])
-	wd = strings.Replace(wd, "/", "\\", -1)
-	return UTF16PtrFromString(wd)
-}
-*/
-
-func abs(path string) (string, error) {
-	r, _ := utf8.DecodeRuneInString(path)
-	if r == '\\' { //"\u2044" // Check if we already have an absolute path
-		return path, nil
-	}
-	wd, err := Getwd()
-	if err != nil {
-		return path, err
-	}
-	wd += "\\" + path
-	return strings.Replace(wd, "/", "\\", -1), nil
-}
-
 
 func Open(path string, mode int, perm uint32) (fd Handle, err error) {
 	if len(path) == 0 {
@@ -1030,19 +1113,21 @@ func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error)
 	// For Go 1.1, we might avoid the allocation of win32finddata1 here
 	// by adding a final Bug [2]uint16 field to the struct and then
 	// adjusting the fields in the result directly.
-	var data1 win32finddata1
+	var data1 WinCEfinddata
 	handle, err = findFirstFile1(name, &data1)
 	if err == nil {
-		copyFindData(data, &data1)
+		copyFindDataWinCE(data, &data1)
 	}
 	return
 }
 
 func FindNextFile(handle Handle, data *Win32finddata) (err error) {
-	var data1 win32finddata1
+	var data1 WinCEfinddata
 	err = findNextFile1(handle, &data1)
 	if err == nil {
-		copyFindData(data, &data1)
+		copyFindDataWinCE(data, &data1)
+	} else {
+		err = GetLastError()
 	}
 	return
 }

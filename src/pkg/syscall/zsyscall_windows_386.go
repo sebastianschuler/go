@@ -284,7 +284,7 @@ func OpenStdConsole(stdhandle int, dev *uint32) (handle Handle, err error) {
 	return
 }
 
-func findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err error) {
+func findFirstFile1(name *uint16, data *WinCEfinddata) (handle Handle, err error) {
 	r0, _, e1 := Syscall(procFindFirstFileW.Addr(), 2, uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(data)), 0)
 	handle = Handle(r0)
 	if handle == InvalidHandle {
@@ -297,7 +297,7 @@ func findFirstFile1(name *uint16, data *win32finddata1) (handle Handle, err erro
 	return
 }
 
-func findNextFile1(handle Handle, data *win32finddata1) (err error) {
+func findNextFile1(handle Handle, data *WinCEfinddata) (err error) {
 	r1, _, e1 := Syscall(procFindNextFileW.Addr(), 2, uintptr(handle), uintptr(unsafe.Pointer(data)), 0)
 	if r1 == 0 {
 		if e1 != 0 {

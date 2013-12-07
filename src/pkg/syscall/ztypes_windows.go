@@ -385,6 +385,28 @@ func copyFindData(dst *Win32finddata, src *win32finddata1) {
 	copy(dst.AlternateFileName[:], src.AlternateFileName[:])
 }
 
+type WinCEfinddata struct {
+	FileAttributes    uint32
+	CreationTime      Filetime
+	LastAccessTime    Filetime
+	LastWriteTime     Filetime
+	FileSizeHigh      uint32
+	FileSizeLow       uint32
+	OID         	  uint32
+	FileName          [MAX_PATH]uint16
+}
+
+func copyFindDataWinCE(dst *Win32finddata, src *WinCEfinddata) {
+	dst.FileAttributes = src.FileAttributes
+	dst.CreationTime = src.CreationTime
+	dst.LastAccessTime = src.LastAccessTime
+	dst.LastWriteTime = src.LastWriteTime
+	dst.FileSizeHigh = src.FileSizeHigh
+	dst.FileSizeLow = src.FileSizeLow
+	
+	copy(dst.FileName[:], src.FileName[:])
+}
+
 type ByHandleFileInformation struct {
 	FileAttributes     uint32
 	CreationTime       Filetime
